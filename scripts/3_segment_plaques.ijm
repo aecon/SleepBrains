@@ -4,7 +4,7 @@
  */
  
 //TODO: look at "FutureDev:" //FutureDev: produce a debugging mode excluding the cropping parts, including all the "for troubleshooting" print statements
-input_directory= "/media/user/SSD1/Athena/Data/REUS_VENAD_TREVC_Desiree/";
+input_directory= "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/";
 //input_directory = "/media/user/SSD1/Athena/Data/test/";
 
 ch0 = "488";
