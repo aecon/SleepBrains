@@ -1,0 +1,61 @@
+//ImageTypes
+(FixedInternalImagePixelType "float")
+(FixedImageDimension 3)
+(MovingInternalImagePixelType "float")
+(MovingImageDimension 3)
+
+//Components
+(Registration "MultiResolutionRegistration")
+(FixedImagePyramid "FixedSmoothingImagePyramid" )
+(MovingImagePyramid "MovingSmoothingImagePyramid" )
+(Interpolator "LinearInterpolator" )
+(Metric "AdvancedMattesMutualInformation" )
+(Optimizer "AdaptiveStochasticGradientDescent")
+(ResampleInterpolator "FinalLinearInterpolator")
+(Resampler "DefaultResampler")
+(Transform "AffineTransform")
+(AutomaticParameterEstimation "true")
+
+(ErodeMask "false")
+
+(NumberOfResolutions 2)
+(ImagePyramidSchedule 2 2 2 1 1 1)
+
+(HowToCombineTransforms "Compose")
+(AutomaticTransformInitialization "true")
+(AutomaticScalesEstimation "true")
+
+(WriteTransformParametersEachIteration "false")
+(WriteResultImage "true")
+(ResultImageFormat "nrrd")
+(CompressResultImage "false")
+(WriteTransformParametersEachResolution "false")
+(ShowExactMetricValue "false")
+
+//Maximum number of iterations in each resolution level:
+(MaximumNumberOfIterations 10000)
+
+//Number of grey level bins in each resolution level:
+(NumberOfHistogramBins 32)
+//(FixedLimitRangeRatio 0.0)
+//(MovingLimitRangeRatio 0.0)
+//(FixedKernelBSplineOrder 3)
+//(MovingKernelBSplineOrder 3)
+
+//Number of spatial samples used to compute the mutual information in each resolution level:
+(ImageSampler "RandomCoordinate" )
+//(FixedImageBSplineInterpolationOrder 3)
+(NumberOfSpatialSamples 3000)
+(NewSamplesEveryIteration "true")
+(CheckNumberOfSamples "true" )
+(MaximumNumberOfSamplingAttempts 2)
+
+(FinalBSplineInterpolationOrder 3)
+
+(AutomaticTransformInitializationMethod "CenterOfGravity")
+(ResultImagePixelType "unsigned short")
+(DefaultPixelValue 0)
+(WriteResultImageAfterEachResolution "false")
+(WritePyramidImagesAfterEachResolution "false")
+(UseDirectionCosines "false")
+

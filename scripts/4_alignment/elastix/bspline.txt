@@ -1,0 +1,54 @@
+(FixedInternalImagePixelType "float")
+(FixedImageDimension 3)
+(MovingInternalImagePixelType "float")
+(MovingImageDimension 3)
+
+(Registration "MultiResolutionRegistration")
+(FixedImagePyramid "FixedSmoothingImagePyramid")
+(MovingImagePyramid "MovingSmoothingImagePyramid")
+(Interpolator "BSplineInterpolator")
+(Metric "AdvancedMattesMutualInformation")
+(Optimizer "AdaptiveStochasticGradientDescent")
+(ResampleInterpolator "FinalBSplineInterpolator")
+(Resampler "DefaultResampler")
+(Transform "BSplineTransform")
+(BSplineTransformSplineOrder 3)
+
+(ErodeMask "false" )
+
+(NumberOfResolutions 2)
+
+(HowToCombineTransforms "Compose")
+(AutomaticTransformInitialization "true")
+(AutomaticTransformInitializationMethod "CenterOfGravity")
+(AutomaticParameterEstimation "true")
+(AutomaticScalesEstimation "true")
+
+(WriteTransformParametersEachIteration "false")
+(WriteResultImage "true")
+(CompressResultImage "true")
+(ResultImageFormat "nrrd")
+(WriteResultImageAfterEachResolution "false") 
+
+(NumberOfSpatialSamples 4000)
+(MaximumNumberOfIterations 15000) 
+(NumberOfHistogramBins 32 )
+
+(ImageSampler "RandomCoordinate")
+(NewSamplesEveryIteration "true")
+(CheckNumberOfSamples "false")
+
+//Default pixel value for pixels that come from outside the picture:
+(DefaultPixelValue 0)
+
+(InitialTransformParametersFileName "NoInitialTransform")
+
+(UseCyclicTransform "false")
+
+(Index 0 0 0)
+(UseDirectionCosines "false")
+(ImagePyramidSchedule 2 2 2 1 1 1)
+(FinalGridSpacingInVoxels 200 200 200 )
+(ResultImagePixelType "unsigned short")
+(WriteTransformParametersEachResolution "false")
+(WritePyramidImagesAfterEachResolution "false")
