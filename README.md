@@ -9,5 +9,5 @@ Quantification of plaques and microglia cells in murine brains.
 - [ ] Check plaques segmentation.
 - [ ] Segment microglia.
 - [ ] Check microglia segmentation.
-- [ ] Align all brains (plaque channel).
-- [ ] Check alignment quality: Make coronal plots per brain.
+- [x] Align all brains (plaque channel).
+- [x] Check alignment quality: Make coronal plots per brain.
