@@ -1,2 +1,2 @@
 # SleepBrains
-Quantification of plaques and microglia cells murine brains.
+Quantification of plaques and microglia cells in murine brains.
