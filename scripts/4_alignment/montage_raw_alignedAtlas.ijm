@@ -3,7 +3,7 @@ input_directory= "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/";
 directories = getFileList(input_directory);
 Ndir = directories.length;
 
-setBatchMode(false);
+setBatchMode(true);
 // Loop over sample directories
 for(i=0; i<Ndir; i++){
 	print("Processing directory", i+1, "/", Ndir, ":", directories[i]);
@@ -33,7 +33,7 @@ for(i=0; i<Ndir; i++){
 	// Changes pixels in the image or selection that have a value in the range v1 - v2 to v3 
 	for (k=1; k<nSlices+1;k++) {
 		Stack.setSlice(k); 
-		print("Slice number = "+k); //Just to check the slice number
+		//print("Slice number = "+k); //Just to check the slice number
 		changeValues(65000,65535,0);
 	}
 	title_Atlas = getTitle();
