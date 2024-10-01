@@ -26,12 +26,12 @@ echo $out
 echo $input_auto
 
 
-atlas="/media/user/SSD1/Athena/SOURCE/PROJECT_SLEEP_2024-09/alignment/atlas/ABA_25um_reference_hemisphere.nrrd"
+atlas="atlas/ABA_25um_reference_hemisphere.nrrd"
 ls $atlas
-atlas_annotation="/media/user/SSD1/Athena/SOURCE/PROJECT_SLEEP_2024-09/alignment/atlas/ABA_25um_annotation_hemisphere.nrrd"
+atlas_annotation="atlas/ABA_25um_annotation_hemisphere.nrrd"
 ls $atlas_annotation
-affine=${SCRIPTPATH}/"affine.txt"
-bspline=${SCRIPTPATH}/"bspline.txt"
+affine="elastix/affine.txt"
+bspline="elastix/bspline.txt"
 ls $affine
 ls $bspline
 threads=32
