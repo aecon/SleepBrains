@@ -32,7 +32,8 @@ atlas="atlas/ABA_25um_reference_hemisphere.nrrd"
 #atlas="atlas/ABA_25um_reference_hemisphere_MaskedCerebellumBrainStemVentricles.nrrd"
 #
 ls $atlas
-atlas_annotation="atlas/ABA_25um_annotation_hemisphere.nrrd"
+#atlas_annotation="atlas/ABA_25um_annotation_hemisphere.nrrd"
+atlas_annotation="/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/5_quantification/output/selected_atlas_areas_pixel25um.nrrd"
 ls $atlas_annotation
 affine="elastix/affine.txt"
 bspline="elastix/bspline.txt"
