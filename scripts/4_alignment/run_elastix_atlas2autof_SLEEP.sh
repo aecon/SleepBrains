@@ -55,13 +55,12 @@ if [ ! -f "${outEb}/result.0.nrrd" ]; then
     ${elastix} -out "${outEb}" -m "${atlas}" -f "${input_auto}" -p "${bspline}" -t0 "${outEa}/TransformParameters.0.txt"  -threads $threads
 fi
 
-# 
-# # transformation of annotation atlas 
-# if [ ! -f "${outT}/result.nrrd" ]; then
-#     cp "${outEb}/TransformParameters.0.txt" "${outT}"/
-#     # edit the Bspline file to use for transforming binary segmented data
-#     sed -i "/FinalBSplineInterpolationOrder/c\(FinalBSplineInterpolationOrder 0)" "${outT}"/TransformParameters.0.txt
-#     # apply transformation to segmentation
-#     ${transformix} -in "${atlas_annotation}" -out "${outT}" -tp "${outT}/TransformParameters.0.txt" -threads $threads
-# fi
-# 
+# transformation of annotation atlas 
+if [ ! -f "${outT}/result.nrrd" ]; then
+    cp "${outEb}/TransformParameters.0.txt" "${outT}"/
+    # edit the Bspline file to use for transforming binary segmented data
+    sed -i "/FinalBSplineInterpolationOrder/c\(FinalBSplineInterpolationOrder 0)" "${outT}"/TransformParameters.0.txt
+    # apply transformation to segmentation
+    ${transformix} -in "${atlas_annotation}" -out "${outT}" -tp "${outT}/TransformParameters.0.txt" -threads $threads
+fi
+
