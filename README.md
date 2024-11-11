@@ -19,7 +19,7 @@ Quantification of plaques and microglia cells in murine brains.
 - [ ] Align Brain 09 separately, due to missing Cerebellum and Brain stem: Removing these from the Atlas improved the alignment but it is not good yet.
 - [x] Make coronal plots per brain.
 - [x] Check alignment quality: All good except for Brain 10 (large hole - will be exluded, and Brain 9 - missing lower part)
-- [ ] Use transformix to align annotation atlas with regions.
+- [x] Use transformix to align annotation atlas with regions.
 
 ### quantification
 - [ ] Count plaques per region, export in txt.
