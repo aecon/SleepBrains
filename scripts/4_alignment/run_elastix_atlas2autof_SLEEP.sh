@@ -27,6 +27,10 @@ echo $input_auto
 
 
 atlas="atlas/ABA_25um_reference_hemisphere.nrrd"
+#
+# specifically from Brain 9 - missing Cerebellum and Brain stem
+#atlas="atlas/ABA_25um_reference_hemisphere_MaskedCerebellumBrainStemVentricles.nrrd"
+#
 ls $atlas
 atlas_annotation="atlas/ABA_25um_annotation_hemisphere.nrrd"
 ls $atlas_annotation
