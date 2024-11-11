@@ -1,0 +1,23 @@
+This file contains information about the segmentation process for plaques (488 nm channel) of the REUS_VENAD_TREVC_Desiree project achived via usage of the ImageJ macro 3_segment_plaques (general parameters as per version "3_segment_plaques_2024-09-23").
+Three thresholds were chosen for normalization (TH1), exclusion of non-brain background (TH2) and inclusion of potential cell candidates (TH3), respectively.
+
+Known potential issues to keep in mind during segmentation QC: Over detection in the striatum, under detection at brain edges
+Known issues with know fixes: segmentation outside brain tissue/in ventricles (erodable after alignment), over detection in the cerebellum (cerebellum will be excluded from analysis).
+
+BrainID	TH1	TH2	TH3	Notes		
+01	767	213	276	- AM: overall quite good detection; especially in the beginning of z-stack over- AND underdetection, small vessels and myelin fibers (mainly in the striatum) falsly detected, overdetection at edges, some small plaques are not detected (but others are -> I cannot recognize the systematic behind)  
+02	824	?	?	no plaques, excluded from analysis 
+03	804	236	281	small plaques; potential over detection at left edge of striatum -> AM: yes, also in the middle but less evident
+04	819	238	281	- AM: much better detection in the beginning of z-stack than in 01, again myelin fiber (striatum) and vessel false detection, false detection in cerebellum, good detection in cortex, some overdetection in hippocampus 
+05	819	237	295	- AM: almost perfect detection in cortex, edge overdetection, mainly in the beginning of z-stack, some false detection of myelin fibers in striatum but less evident than in brains before, false detectction in brainstem and cerebellum, some overdetection in hippocampus 
+06	890	?	?	no plaques, excluded from analysis
+07	757	227	295	- AM: similar to brain 05	
+08	**brain is missing**
+09	669	210	280	cerebellum lost while mounting; large bubble near brain center -> AM: overall quite good detection; as Chiara said also here some overdetection at edges, in vessels, and in ventricle; slight overdetection in striatum; overdetection in bubble; very slight underdetection in shadow of bubble 
+10	553	167	270	enlarged vacuoles, excluded from analysis; under detection due to diff. in LASER intensity 
+11	793	244	281	- AM: again more overdetection in striatum, hippocampus, and edges, false detection in brain stem and cerebellum, shadows do not impede detection 
+12	2000	218	294	normalization was not necessary for this brain
+13	811	214	288	- AM: less edge overdetection but again more overdetection in striatum, false detection in brainstem and cerebellum, hippocampus and cortex very good detection	
+14	744	233	297	redone after discussion on 2024/09/26
+15	679	223	289	- AM: again more edge overdetection especially in the beginning of z-stack, overdetection in striatum, false detection in cerebellum and brain stem, good detection in cortex, hippocampus, and thalamus  
+16	638	201	270	- AM: edge overdetection, especially in the beginning, a lot of overdetection of myelin fibers in striatum, false detection of vessels also inside the brain, false detection in brain stem and cerebellum
