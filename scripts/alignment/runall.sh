@@ -15,5 +15,6 @@ for brain in ${brains}; do
     outdir=`dirname $brain`/align
     echo $outdir
 
-    ./run_elastix_atlas2autof_SLEEP.sh "$outdir" "$brain"
+    #./run_elastix_atlas2autof_SLEEP.sh "$outdir" "$brain"
+    ./run_elastix_data2atlas_PointsTranformix.sh "$outdir" "$brain"
 done
