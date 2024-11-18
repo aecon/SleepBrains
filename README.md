@@ -23,5 +23,7 @@ Quantification of plaques and microglia cells in murine brains.
 
 ### quantification
 - [ ] Count plaques per region, export in txt.
+- [ ] Code is too slow (was developed for smaller brains). Export list of plaque centers, do transformix on points list, then count inside regions.
 - [ ] Make statistics plots.
 - [ ] Voxel-wise pvalues: Compute average number of plaques per voxel. -> NEED TO BE ALIGNED ON THE SAME SPACE FOR THIS..
+
