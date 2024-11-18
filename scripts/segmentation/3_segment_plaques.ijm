@@ -131,31 +131,15 @@ for(i=0; i<Ndir; i++){
 		//print(" > Converting thresholded image to mask."); //for troubleshooting
 		run("Convert to Mask", "method=Default background=Default black");
 		
-		//store candidate cells
+		//store segmented plaques
 		title_segmented = getTitle();
 		selectWindow(title_segmented);
 		segmented_path = input_directory + directories[i] + "segmented_" + file_ch0; //TODO: remove prev. titles
 		//print(" > Storing segmented foreground as 8bit raw file in:" + segmented_path); //for troubleshooting
-		run("Nrrd ... ", "nrrd=" + segmented_path);
-		
-		// Filter on particle size //TODO: ggf. replace this paragraph
-		//print("(g) Filtering very small (<10), very large (>1500), and non-circular particles."); //for troubleshooting
-		selectWindow(title_segmented);
-		run("Analyze Particles...", "size=200-10000 circularity=0.75-1.00 show=Masks clear include stack"); //TODO: show user the max. size for particles, pot. use 
-		title_candidates = getTitle();
-		
-		selectWindow(title_candidates);
-		//close();
 		setOption("ScaleConversions", true); //converts segmented image from 8 to 16 bits to match other files' types
 		run("16-bit"); 
+		run("Nrrd ... ", "nrrd=" + segmented_path);
 		
-		// Store segmented cells
-		//print("(h) Segmented foreground."); //for troubleshooting
-		selectWindow(title_candidates);
-		//input_directory = "/media/user/SSD1/Athena/Data/REUS_VENAD_TREVC_Desiree/Brain10_stitched" //TODO:remove!!!!!
-		plaques_path = input_directory + directories[i] + "plaques_" + file_ch0; //TODO: remove prev. titles
-		//print(" > Storing segmented foreground as 8bit raw file in:" + segmented_path); //for troubleshooting
-		run("Nrrd ... ", "nrrd=" + plaques_path);
 	
 	close("*");
 
@@ -168,4 +152,4 @@ for (i = 0; i < windows.length; i++) {
 	close(windows[i]); //TODO: fix: i.e. don't close log
 }*/
 
-print("\nFinished running macro 'workNrrd'!\n");
+print("\nFinished segmenting plaques (without MLJ filtering)!\n");
