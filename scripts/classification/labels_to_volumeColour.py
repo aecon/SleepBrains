@@ -1,30 +1,25 @@
 import os
 import sys
 import nrrd
+import mmap
 import numba
 import argparse
 import numpy as np
 import pandas as pd
 
 
-@numba.jit(nopython=True, parallel=False, fastmath=True)
-def test(brain):
-    nx,ny,nz = brain.shape  # checked: nrrd load data in (Y,X,Z) format
-    for i in numba.prange(nx):
-        for j in numba.prange(ny):
-            for k in numba.prange(nz):
-                brain[i,j,k] = 10 + brain[i,j,k]
 
-
-@numba.jit(nopython=True, parallel=False, fastmath=True)
+@numba.jit(nopython=True, parallel=True, fastmath=True)
 def colour(inputs, outputs, labels, colour):
     nx,ny,nz = inputs.shape  # checked: nrrd load data in (Y,X,Z) format
     for i in numba.prange(nx):
         for j in numba.prange(ny):
             for k in numba.prange(nz):
                 label = inputs[i,j,k]
-                idx = np.where(labels == label)[0][0]
-                outputs[i,j,k] = colour[idx]
+                if label > 0:
+                    idx = label-1
+                    outputs[i,j,k] = colour[idx]
+
 
 
 parser = argparse.ArgumentParser()
@@ -33,7 +28,7 @@ args = parser.parse_args()
 
 
 file_labels = args.i
-file_brain = os.path.dirname(file_labels) + os.sep + "labelled_" + os.path.basename(file_labels).split("-morpho")[0] + ".tif-lbl.nrrd"
+file_brain = os.path.dirname(file_labels) + os.sep + "labelled_" + os.path.basename(file_labels).split("-morpho")[0] + ".nrrd"
 print("Colouring brain:", file_brain)
 if os.path.exists(file_brain):
     print("Found labeled brain!")
@@ -57,14 +52,18 @@ spericity=data["Sphericity"].to_numpy()
 
 
 print("Colouring brain ...")
-
-# Colour by pixel volume
-maxLabel = np.max(labels)
-brain_coloured_volume = np.zeros(np.shape(brain), dtype=int)
-test(brain)
+assert(len(labels) == np.max(labels))
+# - by volume
+brain_coloured_volume = np.zeros(np.shape(brain), dtype=np.int32)
 colour(brain, brain_coloured_volume, labels, volumes)
+# - by sphericity
+brain_coloured_sph = np.zeros(np.shape(brain), dtype=np.float32)
+colour(brain, brain_coloured_sph, labels, spericity)
 
 
 # Save coloured brain
-#print("Saving coloured brain ...")
-#TODO
+print("Saving coloured brain ...")
+nrrd.write('%s_colouredVolume.nrrd' % file_brain, brain_coloured_volume)
+print("Saving coloured brain ...")
+nrrd.write('%s_colouredSphericity.nrrd' % file_brain, brain_coloured_sph)
+
