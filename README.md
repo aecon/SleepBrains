@@ -2,6 +2,22 @@
 Quantification of plaques and microglia cells in murine brains.
 
 
+## Installation
+```
+conda create -n SleepBrains -c conda-forge python=3.10
+conda activate SleepBrains
+
+pip install allensdk
+pip install ipykernel
+python -m ipykernel install --user --name=allensdk
+
+pip install nrrd scikit-image numpy matplotlib pandas pynrrd numba scipy
+```
+
+```
+
+AllenSDK: https://allensdk.readthedocs.io/en/latest/install.html
+
 
 ## TODO
 ### preprocessing
