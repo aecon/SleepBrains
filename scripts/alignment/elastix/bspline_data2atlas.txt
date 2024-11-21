@@ -56,7 +56,7 @@
 
 // ********** Memory consumption considerations
 (FixedInternalImagePixelType "short")               // Memory consumption: Images in elastix are internally by default as floats. Use short for low memory.
-(MovingInternalImagePixelType "float")
+(MovingInternalImagePixelType "short")
 
 
 // ********** Output options
