@@ -1,60 +1,83 @@
-(FixedInternalImagePixelType "float")
-(FixedImageDimension 3)
-(MovingInternalImagePixelType "float")
-(MovingImageDimension 3)
-
+// ********** Registration
 (Registration "MultiResolutionRegistration")
-(FixedImagePyramid "FixedSmoothingImagePyramid")
-(MovingImagePyramid "MovingSmoothingImagePyramid")
-(Interpolator "BSplineInterpolator")
-(Metric "AdvancedMattesMutualInformation")
-(Optimizer "AdaptiveStochasticGradientDescent")
-(Resampler "DefaultResampler")
-(ResampleInterpolator "FinalBSplineInterpolator")
+
+
+// ********** Metric
+(Metric "AdvancedMattesMutualInformation")          // Mutual Information (MI) metric
+(NumberOfHistogramBins 32)                          // needed to compute the joint histogram in MI metric
+
+
+// ********** Sampler                               // Samples are drawn on the Fixed image, then transformed to map to Moving image
+(ImageSampler "RandomCoordinate")                   // works well with Gradient Descent-based optimizers
+(NumberOfSpatialSamples 4000)                       // recommendation: 3000. Minimum recommended: 2000
+(NewSamplesEveryIteration "true")                   // an important option of the random samplers
+(CheckNumberOfSamples "true")                       // default:true. Metric checks if at least a fraction (default 1/4) of samples map inside moving image
+(UseRandomSampleRegion "false")                     // default:false. sampler draws samples from the entire image domain
+
+
+// ********** Interpolator
+(Interpolator "LinearInterpolator")                 // During registration use LinearInterpolator. Much faster than 1st order B-spline
+//(Interpolator "BSplineInterpolatorFloat")
+(ResampleInterpolator "FinalBSplineInterpolator")   // Recommendation: 3rd order B-spline for final deformed moving image.
+//(ResampleInterpolator "FinalBSplineInterpolatorFloat")  // for reduced memory consumption
 (FinalBSplineInterpolationOrder 3)
+(Resampler "DefaultResampler")                      // Recommendation: DefaultResampler: generates the deformed moving image after registration
 
-(Transform "BSplineTransform")
+
+// ********** Transform                             // Recommendation: Start with rigid/affine transformation before a nonrigid, for good initial alignment.
+(HowToCombineTransforms "Compose")                  // it is wise to include this line in every parameter file
+(AutomaticTransformInitialization "true")           // facilitates the automatic estimation of an initial alignment for translation, rigid, similarity or affine.
+(AutomaticTransformInitializationMethod "CenterOfGravity") // methods to do so: aligns the centres of gravity
+(AutomaticParameterEstimation "true")
+(AutomaticScalesEstimation "true")
+//(Transform "BSplineTransform")                      // defined by uniform grid of control points: grid is defined by spacing between grid nodes
+(Transform "RecursiveBSplineTransform")             // Since elastix 4.9: new implementation, faster
 (BSplineTransformSplineOrder 3)
+(NumberOfResolutions 2)                             // specify a multi-grid schedule: For each resolution level you can define a different grid spacing.
+(FinalGridSpacingInVoxels 200 200 200 )             // final grid spacing
+(GridSpacingSchedule 2 2 2 1 1 1)                   // multiplication factors for all resolution levels: Number*FinalGridSpacingInVoxels
 
-(NumberOfResolutions 3)
-(ImagePyramidSchedule 4 4 4 2 2 2 1 1 1)   // sigma = Number/2
 
-(FinalGridSpacingInVoxels 20 20 20 )
-(GridSpacingSchedule 3 3 3 2 2 2 1 1 1)
+// ********** Optimizer
+(Optimizer "AdaptiveStochasticGradientDescent")
+(ASGDParameterEstimationMethod "DisplacementDistribution")  // improved version, recommended
+(MaximumNumberOfIterations 15000) 
 
+
+// ********** Image pyramids
+(FixedImagePyramid "FixedSmoothingImagePyramid")    // recommended with random samplers
+(MovingImagePyramid "MovingSmoothingImagePyramid")
+(ImagePyramidSchedule 4 4 4 2 2 2)                  // DEPENDS ON: NumberOfResolutions. sigma or each resolution = Number/2. Specifying both fixed and moving image pyramids with identical schedule
+
+
+// ********** Masks                                 // Sometimes you are specifically interested in aligning only a part of the image.
 (ErodeMask "false" )
 
 
-(HowToCombineTransforms "Compose")
-(AutomaticTransformInitialization "true")
-(AutomaticTransformInitializationMethod "CenterOfGravity")
-(AutomaticParameterEstimation "true")
-(AutomaticScalesEstimation "true")
+// ********** Memory consumption considerations
+(FixedInternalImagePixelType "short")               // Memory consumption: Images in elastix are internally by default as floats. Use short for low memory.
+(MovingInternalImagePixelType "float")
 
+
+// ********** Output options
 (WriteTransformParametersEachIteration "false")
+(WriteResultImageAfterEachResolution "false") 
 (WriteResultImage "true")
 (CompressResultImage "true")
 (ResultImageFormat "nrrd")
-(WriteResultImageAfterEachResolution "false") 
-
-(NumberOfSpatialSamples 4000)
-(MaximumNumberOfIterations 15000) 
-(NumberOfHistogramBins 32 )
-
-(ImageSampler "RandomCoordinate")
-(NewSamplesEveryIteration "true")
-(CheckNumberOfSamples "false")
-
-//Default pixel value for pixels that come from outside the picture:
-(DefaultPixelValue 0)
-
-(InitialTransformParametersFileName "NoInitialTransform")
-
-(UseCyclicTransform "false")
-
-(Index 0 0 0)
-(UseDirectionCosines "false")
-
-(ResultImagePixelType "unsigned short")
 (WriteTransformParametersEachResolution "false")
 (WritePyramidImagesAfterEachResolution "false")
+(ResultImagePixelType "unsigned short")
+
+
+
+// ********** Other options
+(DefaultPixelValue 0)                               // Default pixel value for pixels that come from outside the picture:
+(UseDirectionCosines "true")                        // elastix 4.3 default: false for backward compabitility. From elastix 4.8 default: true.
+(UseCyclicTransform "false")                        // useful for dynamic imaging data in which the motion is assumed to be cyclic
+
+(FixedImageDimension 3)
+(MovingImageDimension 3)
+(Index 0 0 0)
+
+//(InitialTransformParametersFileName "NoInitialTransform")   // does not appear in the documentation any more ..
