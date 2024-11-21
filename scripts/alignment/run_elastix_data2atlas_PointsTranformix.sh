@@ -26,24 +26,28 @@ echo $out
 echo $input_auto
 
 
+# REFERENCE ATLAS
 atlas="atlas/ABA_25um_reference_hemisphere.nrrd"
 #
-# specifically from Brain 9 - missing Cerebellum and Brain stem
-#atlas="atlas/ABA_25um_reference_hemisphere_MaskedCerebellumBrainStemVentricles.nrrd"
+# specifically for Brain 9 - missing Cerebellum and Brain stem
+#atlas="atlas/ABA_25um_reference_hemisphere_MaskedCerebellumBrainStemVentricles_edited.nrrd"
 #
 ls $atlas
+
+# ANNOTATION ATLAS
 #atlas_annotation="atlas/ABA_25um_annotation_hemisphere.nrrd"
 atlas_annotation="/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/output/selected_atlas_areas_pixel25um.nrrd"
 ls $atlas_annotation
+
 affine="elastix/affine.txt"
-bspline="elastix/bspline.txt"
+bspline="elastix/bspline_data2atlas.txt"
 ls $affine
 ls $bspline
 threads=32
 
-outEa=${out}/elastix2_affine
-outEb=${out}/elastix2_bspline
-outT=${out}/transformix2
+outEa=${out}/elastix_affine
+outEb=${out}/elastix_bspline
+outT=${out}/transformix
 mkdir -p "${outEa}"
 mkdir -p "${outEb}"
 mkdir -p "${outT}"
@@ -56,14 +60,14 @@ if [ ! -f "${outEb}/result.0.nrrd" ]; then
     ${elastix} -out "${outEb}" -m "${input_auto}" -f "${atlas}" -p "${bspline}" -t0 "${outEa}/TransformParameters.0.txt"  -threads $threads
 fi
 
-# transformation of annotation atlas 
-if [ ! -f "${outT}/result.nrrd" ]; then
-    cp "${outEb}/TransformParameters.0.txt" "${outT}"/
-    # edit the Bspline file to use for transforming binary segmented data
-    sed -i "/FinalBSplineInterpolationOrder/c\(FinalBSplineInterpolationOrder 0)" "${outT}"/TransformParameters.0.txt
-    # apply transformation to segmentation
-    ${transformix} -in "${atlas_annotation}" -out "${outT}" -tp "${outT}/TransformParameters.0.txt" -threads $threads
-fi
+## transformation of annotation atlas 
+#if [ ! -f "${outT}/result.nrrd" ]; then
+#    cp "${outEb}/TransformParameters.0.txt" "${outT}"/
+#    # edit the Bspline file to use for transforming binary segmented data
+#    sed -i "/FinalBSplineInterpolationOrder/c\(FinalBSplineInterpolationOrder 0)" "${outT}"/TransformParameters.0.txt
+#    # apply transformation to segmentation
+#    ${transformix} -in "${atlas_annotation}" -out "${outT}" -tp "${outT}/TransformParameters.0.txt" -threads $threads
+#fi
 
 
 # TODO:

@@ -36,7 +36,7 @@ ls $atlas
 atlas_annotation="/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/5_quantification/output/selected_atlas_areas_pixel25um.nrrd"
 ls $atlas_annotation
 affine="elastix/affine.txt"
-bspline="elastix/bspline.txt"
+bspline="elastix/bspline_atlas2data.txt"
 ls $affine
 ls $bspline
 threads=32
