@@ -1,3 +1,4 @@
 *.nrrd
 *.tif
 *__pycache__
+out*
