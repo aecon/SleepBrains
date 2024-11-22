@@ -1,61 +1,78 @@
-//ImageTypes
-(FixedInternalImagePixelType "float")
-(FixedImageDimension 3)
-(MovingInternalImagePixelType "float")
-(MovingImageDimension 3)
-
-//Components
+// ********** Registration
 (Registration "MultiResolutionRegistration")
-(FixedImagePyramid "FixedSmoothingImagePyramid" )
-(MovingImagePyramid "MovingSmoothingImagePyramid" )
-(Interpolator "LinearInterpolator" )
-(Metric "AdvancedMattesMutualInformation" )
-(Optimizer "AdaptiveStochasticGradientDescent")
-(ResampleInterpolator "FinalLinearInterpolator")
-(Resampler "DefaultResampler")
-(Transform "AffineTransform")
-(AutomaticParameterEstimation "true")
 
-(ErodeMask "false")
 
-(NumberOfResolutions 2)
-(ImagePyramidSchedule 10 10 10 1 1 1)
+// ********** Metric
+(Metric "AdvancedMattesMutualInformation")          // Mutual Information (MI) metric
+(NumberOfHistogramBins 32)                          // needed to compute the joint histogram in MI metric
 
-(HowToCombineTransforms "Compose")
-(AutomaticTransformInitialization "true")
-(AutomaticScalesEstimation "true")
 
-(WriteTransformParametersEachIteration "false")
-(WriteResultImage "true")
-(ResultImageFormat "nrrd")
-(CompressResultImage "false")
-(WriteTransformParametersEachResolution "false")
-(ShowExactMetricValue "false")
-
-//Maximum number of iterations in each resolution level:
-(MaximumNumberOfIterations 10000)
-
-//Number of grey level bins in each resolution level:
-(NumberOfHistogramBins 32)
-//(FixedLimitRangeRatio 0.0)
-//(MovingLimitRangeRatio 0.0)
-//(FixedKernelBSplineOrder 3)
-//(MovingKernelBSplineOrder 3)
-
-//Number of spatial samples used to compute the mutual information in each resolution level:
-(ImageSampler "RandomCoordinate" )
-//(FixedImageBSplineInterpolationOrder 3)
-(NumberOfSpatialSamples 4000)
-(NewSamplesEveryIteration "true")
-(CheckNumberOfSamples "true" )
+// ********** Sampler                               // Samples are drawn on the Fixed image, then transformed to map to Moving image
+(ImageSampler "RandomCoordinate")                   // works well with Gradient Descent-based optimizers
+(NumberOfSpatialSamples 4000)                       // recommendation: 3000. Minimum recommended: 2000
+(NewSamplesEveryIteration "true")                   // an important option of the random samplers
+(CheckNumberOfSamples "true")                       // default:true. Metric checks if at least a fraction (default 1/4) of samples map inside moving image
 (MaximumNumberOfSamplingAttempts 5)
+(UseRandomSampleRegion "false")                     // default:false. sampler draws samples from the entire image domain
 
-(FinalBSplineInterpolationOrder 3)
 
-(AutomaticTransformInitializationMethod "CenterOfGravity")
-(ResultImagePixelType "unsigned short")
-(DefaultPixelValue 0)
-(WriteResultImageAfterEachResolution "false")
+// ********** Interpolator
+(Interpolator "LinearInterpolator")                 // During registration use LinearInterpolator. Much faster than 1st order B-spline
+(ResampleInterpolator "FinalLinearInterpolator")    // Recommendation: 3rd order B-spline for final deformed moving image.
+//(FinalBSplineInterpolationOrder 3)
+(Resampler "DefaultResampler")                      // Recommendation: DefaultResampler: generates the deformed moving image after registration
+
+
+// ********** Transform                             // Recommendation: Start with rigid/affine transformation before a nonrigid, for good initial alignment.
+(HowToCombineTransforms "Compose")                  // it is wise to include this line in every parameter file
+(AutomaticTransformInitialization "true")           // facilitates the automatic estimation of an initial alignment for translation, rigid, similarity or affine.
+(AutomaticTransformInitializationMethod "CenterOfGravity") // methods to do so: aligns the centres of gravity
+(AutomaticParameterEstimation "true")
+(AutomaticScalesEstimation "true")
+(Transform "AffineTransform")
+(NumberOfResolutions 2)                             // specify a multi-grid schedule: For each resolution level you can define a different grid spacing.
+
+
+// ********** Optimizer
+(Optimizer "AdaptiveStochasticGradientDescent")
+(ASGDParameterEstimationMethod "DisplacementDistribution")  // improved version, recommended
+(MaximumNumberOfIterations 10000) 
+
+
+// ********** Image pyramids
+(FixedImagePyramid "FixedSmoothingImagePyramid")    // recommended with random samplers
+(MovingImagePyramid "MovingSmoothingImagePyramid")
+(ImagePyramidSchedule 10 10 10 1 1 1)               // DEPENDS ON: NumberOfResolutions. sigma or each resolution = Number/2. Specifying both fixed and moving image pyramids with identical schedule
+
+
+// ********** Masks                                 // Sometimes you are specifically interested in aligning only a part of the image.
+(ErodeMask "false" )
+
+
+// ********** Memory consumption considerations
+(FixedInternalImagePixelType "float")               // Memory consumption: Images in elastix are internally by default as floats. Use short for low memory.
+(MovingInternalImagePixelType "float")
+
+
+// ********** Output options
+(WriteTransformParametersEachIteration "false")
+(WriteResultImageAfterEachResolution "false") 
+(WriteResultImage "true")
+//(CompressResultImage "true")
+(CompressResultImage "false")
+(ResultImageFormat "nrrd")
+(WriteTransformParametersEachResolution "false")
 (WritePyramidImagesAfterEachResolution "false")
-(UseDirectionCosines "false")
+(ResultImagePixelType "unsigned short")
 
+
+// ********** Other options
+(DefaultPixelValue 0)                               // Default pixel value for pixels that come from outside the picture:
+(UseDirectionCosines "true")                        // elastix 4.3 default: false for backward compabitility. From elastix 4.8 default: true.
+(UseCyclicTransform "false")                        // useful for dynamic imaging data in which the motion is assumed to be cyclic
+
+(FixedImageDimension 3)
+(MovingImageDimension 3)
+(Index 0 0 0)
+
+(ShowExactMetricValue "false")
