@@ -74,42 +74,45 @@ def load_nrrd(path, dtype):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', type=str, required=True, help="csv, list with object measurements")
+parser.add_argument('-i', type=str, required=True, nargs='+', help="csv, list with object measurements")
 args = parser.parse_args()
 
 # Find paths
-file_csv = args.i
-file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
-file_raw    = find_file( (os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("segmented_")[1]).split("-morpho")[0] + ".tif.nrrd"  )
-
-# Load 3D data
-raw     = load_nrrd(file_raw, dtype=np.uint16)
-labels3 = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
-
-# Load csv data
-df = pd.read_csv(file_csv)
-labels  = df["Label"].to_numpy()
-volumes = df["VoxelCount"].to_numpy()  # In Voxels
-
-# Compute object intensity stats (mean, std)
-#
-# --> Step 1: Get all coordinates per object
-assert(len(labels) == np.max(labels))
-sumVolumes = np.sum(volumes)
-coordinates = np.zeros( (sumVolumes*3) )
-counts_cumsum  = np.cumsum(volumes).astype(np.uint64)
-get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
-#
-# --> Step 2: Compute intensity stats per object
-intensity_mean = np.zeros(len(labels))
-intensity_std  = np.zeros(len(labels))
-get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std)
-
-# Add column to dataframe
-df.['IntensityAvg'] = intensity_mean
-df.['IntensityStd'] = intensity_std
-
-# Export to csv
-output_path = file_csv + "_withIntensity.csv"
-df.to_csv(output_path, index=False)
+for file_csv in args.i:
+    print("\nProcessing:", file_csv)
+    file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
+    file_raw    = find_file( (os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("segmented_")[1]).split("-morpho")[0] + ".tif.nrrd"  )
+    
+    # Load 3D data
+    raw     = load_nrrd(file_raw, dtype=np.uint16)
+    labels3 = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
+    
+    # Load csv data
+    df = pd.read_csv(file_csv)
+    labels  = df["Label"].to_numpy()
+    volumes = df["VoxelCount"].to_numpy()  # In Voxels
+    
+    # Compute object intensity stats (mean, std)
+    #
+    # --> Step 1: Get all coordinates per object
+    print("Computing intensity stats ...")
+    assert(len(labels) == np.max(labels))
+    sumVolumes = np.sum(volumes)
+    coordinates = np.zeros( (sumVolumes*3) )
+    counts_cumsum  = np.cumsum(volumes).astype(np.uint64)
+    get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
+    #
+    # --> Step 2: Compute intensity stats per object
+    intensity_mean = np.zeros(len(labels))
+    intensity_std  = np.zeros(len(labels))
+    get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std)
+    
+    # Add column to dataframe
+    df['IntensityAvg'] = intensity_mean
+    df['IntensityStd'] = intensity_std
+    
+    # Export to csv
+    print("Exporting to csv ...")
+    output_path = file_csv + "_withIntensity.csv"
+    df.to_csv(output_path, index=False)
 
