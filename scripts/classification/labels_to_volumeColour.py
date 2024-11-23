@@ -21,27 +21,33 @@ def colour(inputs, outputs, labels, colour):
                     outputs[i,j,k] = colour[idx]
 
 
+def find_file(path):
+    if os.path.exists(path):
+        print("Found file:", path)
+    else:
+        print("File not found:", path)
+        sys.exit()
+    return path
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', type=str, required=True, help="csv, list with object measurements")
 args = parser.parse_args()
 
 
-file_labels = args.i
-file_brain = os.path.dirname(file_labels) + os.sep + "labelled_" + os.path.basename(file_labels).split("-morpho")[0] + ".nrrd"
-print("Colouring brain:", file_brain)
-if os.path.exists(file_brain):
-    print("Found labeled brain!")
-else:
-    print("File not found... Exiting.")
-    sys.exit()
+file_csv = args.i
+file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
+file_raw    = find_file( (os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("segmented_")[1]).split("-morpho")[0] + ".nrrd"  )
+
+assert(0)
+
 
 print("Loading brain ...")
-brain, _ = nrrd.read(file_brain)
+brain, _ = nrrd.read(file_labels)
 brain = np.asarray(brain, dtype=np.uint32)
 
 print("Loading csv ...")
-data = pd.read_csv(file_labels)
+data = pd.read_csv(file_csv)
 # Label,VoxelCount,Volume,SurfaceArea,Sphericity,Centroid.X,Centroid.Y,Centroid.Z,InscrBall.Center.X,InscrBall.Center.Y,InscrBall.Center.Z,InscrBall.Radius
 labels  = data["Label"].to_numpy()
 volumes = data["VoxelCount"].to_numpy()
@@ -63,7 +69,7 @@ colour(brain, brain_coloured_sph, labels, spericity)
 
 # Save coloured brain
 print("Saving coloured brain ...")
-nrrd.write('%s_colouredVolume.nrrd' % file_brain, brain_coloured_volume)
+nrrd.write('%s_colouredVolume.nrrd' % file_labels, brain_coloured_volume)
 print("Saving coloured brain ...")
-nrrd.write('%s_colouredSphericity.nrrd' % file_brain, brain_coloured_sph)
+nrrd.write('%s_colouredSphericity.nrrd' % file_labels, brain_coloured_sph)
 
