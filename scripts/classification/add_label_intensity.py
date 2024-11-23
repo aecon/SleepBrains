@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-
+# ALSO HAS TO BE RUN WITH PARALLEL=FALSE!
 @numba.jit(nopython=True, parallel=False, fastmath=True)
 def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std):
     Nlabels = len(labels)
@@ -100,11 +100,13 @@ for file_csv in args.i:
     sumVolumes = np.sum(volumes)
     coordinates = np.zeros( (sumVolumes*3) )
     counts_cumsum  = np.cumsum(volumes).astype(np.uint64)
+    print("- Getting coordinates")
     get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
     #
     # --> Step 2: Compute intensity stats per object
     intensity_mean = np.zeros(len(labels))
     intensity_std  = np.zeros(len(labels))
+    print("- Getting intensity stats")
     get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std)
     
     # Add column to dataframe
