@@ -11,6 +11,7 @@ import pandas as pd
 # ALSO HAS TO BE RUN WITH PARALLEL=FALSE!
 @numba.jit(nopython=True, parallel=False, fastmath=True)
 def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std):
+    nx,ny,nz = raw.shape  # checked: nrrd loads data in (Y,X,Z) format
     Nlabels = len(labels)
     Npixels = len(coordinates)/3
 
@@ -22,9 +23,11 @@ def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, inten
         # Loop over the pixel of the particular object
         for i in range(volume):
             g = int(base + i*3)
+            assert((g+2) < len(coordinates))
             pi = int(coordinates[g + 0])
             pj = int(coordinates[g + 1])
             pk = int(coordinates[g + 2])
+            assert((pi<nx) and (pj<ny) and (pk<nz))
             intensities[i] = raw[pi,pj,pk]
 
         # At the end of the loop for this object, compute mean, std
