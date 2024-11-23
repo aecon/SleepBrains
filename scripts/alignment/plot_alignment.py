@@ -45,18 +45,26 @@ slices = [50, 100, 150, 200, 250, 300, 350, 400, 450]
 for ic in range(9):
     k = int(ic)
     i = int(slices[k])
-    print(i)
     pa = ax[ic].imshow(cells[:,i,:],interpolation='nearest',cmap=cm.gray, vmin=Vmin, vmax=Vmax)
     pb = ax[ic].contour(np.log10(atlas[:,i,:]+1), levels=10, linewidths=0.5, linestyles='-', colors='m')
-    #pb = ax[ic].contour(atlas[:,i,:], levels=3, linewidths=0.5, linestyles='-', colors='m')
-    print(np.min(atlas[:,i,:]), np.mean(atlas[:,i,:]), np.max(atlas[:,i,:]))
-
     ax[ic].set_axis_off()
-
 plt.subplots_adjust(wspace=0, hspace=0)
-#plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
+plt.savefig("%s/%s_1a.png" % (args.o, args.s), transparent=True, pad_inches=0)
+plt.close()
 
-plt.savefig("%s/%s_alignment.png" % (args.o, args.s), transparent=True, pad_inches=0)
-#plt.savefig("%s/%s_alignment.png" % (args.o, args.s))
+
+# plot sagittal view
+Nc=9
+Nr=1
+fig,ax = plt.subplots(Nr,Nc, figsize=(36,4), constrained_layout=True)
+slices = np.arange(30,228,20)
+for ic in range(9):
+    k = int(ic)
+    i = int(slices[k])
+    pa = ax[ic].imshow(cells[:,:,i],interpolation='nearest',cmap=cm.gray, vmin=Vmin, vmax=Vmax)
+    pb = ax[ic].contour(np.log10(atlas[:,:,i]+1), levels=10, linewidths=0.5, linestyles='-', colors='m')
+    ax[ic].set_axis_off()
+plt.subplots_adjust(wspace=0, hspace=0)
+plt.savefig("%s/%s_1b.png" % (args.o, args.s), transparent=True, pad_inches=0)
 plt.close()
 
