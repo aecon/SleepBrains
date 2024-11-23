@@ -17,15 +17,15 @@ def get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates):
         for j in range(ny):
             for i in range(nx):  # C order (row major)
                 label = labels3[i,j,k]
-                if label > 0:
+                if label > 1:  # ignore the first object
                     idx = int(label-1)
-                    base = counts_cumsum[idx] * 3
-                    g = base + counter[idx] * 3
+                    base = counts_cumsum[idx-1] * 3
+                    g = int(base + counter[idx] * 3)
                     coordinates[g + 0] = i
                     coordinates[g + 1] = j
                     coordinates[g + 2] = k
-                    counters[idx] = counters[idx] + 1
-    for i in range(len(labels)):
+                    counter[idx] = counter[idx] + 1
+    for i in range(1,len(labels)):
         assert(counter[i] == volumes[i])
 
 
