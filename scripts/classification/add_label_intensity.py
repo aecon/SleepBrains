@@ -17,14 +17,14 @@ def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, inten
     # Loop over the objects
     for idx in range(1, Nlabels):  # ignore the first object
         base = counts_cumsum[idx-1] * 3
-        volume = volumes[idx]
+        volume = int(volumes[idx])
         intensities = np.zeros(volume)
         # Loop over the pixel of the particular object
         for i in range(volume):
             g = int(base + i*3)
-            pi = coordinates[g + 0]
-            pj = coordinates[g + 1]
-            pk = coordinates[g + 2]
+            pi = int(coordinates[g + 0])
+            pj = int(coordinates[g + 1])
+            pk = int(coordinates[g + 2])
             intensities[i] = raw[pi,pj,pk]
 
         # At the end of the loop for this object, compute mean, std
