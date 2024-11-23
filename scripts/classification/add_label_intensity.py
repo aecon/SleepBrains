@@ -10,9 +10,35 @@ import pandas as pd
 
 
 @numba.jit(nopython=True, parallel=False, fastmath=True)
+def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std):
+    Nlabels = len(labels)
+    Npixels = len(coordinates)/3
+
+    # Loop over the objects
+    for idx in range(1, Nlabels):  # ignore the first object
+        base = counts_cumsum[idx-1] * 3
+        volume = volumes[idx]
+        intensities = np.zeros(volume)
+        # Loop over the pixel of the particular object
+        for i in range(volume):
+            g = int(base + i*3)
+            pi = coordinates[g + 0]
+            pj = coordinates[g + 1]
+            pk = coordinates[g + 2]
+            intensities[i] = raw[pi,pj,pk]
+
+        # At the end of the loop for this object, compute mean, std
+        intensity_mean[idx] = np.nanmean(intensities)
+        intensity_std[idx]  = np.nanstd(intensities)
+
+
+# HAS TO BE PARALLEL=FALSE! PARALLEL VERSION WILL HAVE RACE CONDITION ON COUNTER
+@numba.jit(nopython=True, parallel=False, fastmath=True)
 def get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates):
     nx,ny,nz = labels3.shape  # checked: nrrd loads data in (Y,X,Z) format
     counter = np.zeros(len(labels))
+
+    # Loop over the image, once
     for k in range(nz):
         for j in range(ny):
             for i in range(nx):  # C order (row major)
@@ -66,11 +92,19 @@ labels      = data["Label"].to_numpy()
 volumes     = data["VoxelCount"].to_numpy()  # In Voxels
 
 # Compute object intensity stats (mean, std)
+#
+# --> Step 1: Get all coordinates per object
 assert(len(labels) == np.max(labels))
 sumVolumes = np.sum(volumes)
 coordinates = np.zeros( (sumVolumes*3) )
 counts_cumsum  = np.cumsum(volumes).astype(np.uint64)
 get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
+#
+# --> Step 2: Compute intensity stats per object
+intensity_mean = np.zeros(len(labels))
+intensity_std  = np.zeros(len(labels))
+get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std)
+
 
 
 assert(0)
