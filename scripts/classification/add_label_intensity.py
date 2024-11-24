@@ -95,11 +95,12 @@ for file_csv in args.i:
     df = pd.read_csv(file_csv)
     labels  = df["Label"].to_numpy()
     volumes = df["VoxelCount"].to_numpy()  # In Voxels
-    print(volumes.dtype)
 
     # Checks
     assert(len(labels) == np.max(labels))
     assert(np.max(labels) == np.max(labels3))
+    assert(volumes.dtype == np.int64)
+    assert(labels.dtype == np.int64)
     assert(0)
 
 
