@@ -88,8 +88,9 @@ for file_csv in args.i:
     file_raw    = find_file( (os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("segmented_")[1]).split("-morpho")[0] + ".tif.nrrd"  )
 
     # Load 3D data
-    raw     = load_nrrd(file_raw, dtype=np.uint16)
-    labels3 = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
+    raw      = load_nrrd(file_raw, dtype=np.uint16)
+    labels3F = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
+    labels3  = labels3F.astype(np.int64)
 
     # Load csv data
     df = pd.read_csv(file_csv)
