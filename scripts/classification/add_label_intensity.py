@@ -24,7 +24,6 @@ def get_intensity_stats(raw, volumes, coordinates, counts_cumsum, intensity_mean
         # Loop over the pixel of the particular object
         for i in range(volume):
             g = int(base + i*3)
-            print(g+2, i, volume, base, len(coordinates))
             assert((g+2) < Nc)
             pi = coordinates[g + 0]
             pj = coordinates[g + 1]
