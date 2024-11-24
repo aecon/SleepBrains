@@ -23,6 +23,7 @@ def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, inten
         # Loop over the pixel of the particular object
         for i in range(volume):
             g = int(base + i*3)
+            print(g+2, i, volume, base, len(coordinates))
             assert((g+2) < len(coordinates))
             pi = int(coordinates[g + 0])
             pj = int(coordinates[g + 1])
@@ -85,21 +86,27 @@ for file_csv in args.i:
     print("\nProcessing:", file_csv)
     file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
     file_raw    = find_file( (os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("segmented_")[1]).split("-morpho")[0] + ".tif.nrrd"  )
-    
+
     # Load 3D data
     raw     = load_nrrd(file_raw, dtype=np.uint16)
     labels3 = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
-    
+
     # Load csv data
     df = pd.read_csv(file_csv)
     labels  = df["Label"].to_numpy()
     volumes = df["VoxelCount"].to_numpy()  # In Voxels
-    
+    print(volumes.dtype)
+
+    # Checks
+    assert(len(labels) == np.max(labels))
+    assert(np.max(labels) == np.max(labels3))
+    assert(0)
+
+
     # Compute object intensity stats (mean, std)
     #
     # --> Step 1: Get all coordinates per object
     print("Computing intensity stats ...")
-    assert(len(labels) == np.max(labels))
     sumVolumes = np.sum(volumes)
     coordinates = np.zeros( (sumVolumes*3) )
     counts_cumsum  = np.cumsum(volumes).astype(np.uint64)
@@ -111,11 +118,11 @@ for file_csv in args.i:
     intensity_std  = np.zeros(len(labels))
     print("- Getting intensity stats")
     get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std)
-    
+
     # Add column to dataframe
     df['IntensityAvg'] = intensity_mean
     df['IntensityStd'] = intensity_std
-    
+
     # Export to csv
     print("Exporting to csv ...")
     output_path = file_csv + "_withIntensity.csv"
