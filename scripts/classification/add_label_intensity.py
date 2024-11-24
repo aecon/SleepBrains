@@ -134,3 +134,12 @@ if __name__ == '__main__':
         output_path = file_csv + "_withIntensity.csv"
         df.to_csv(output_path, index=False)
 
+        del labels3
+        del raw
+        del coordinates
+        del labels
+        del volumes
+        del counts_cumsum
+        del intensity_mean
+        del intensity_std
+
