@@ -10,37 +10,39 @@ import pandas as pd
 
 # ALSO HAS TO BE RUN WITH PARALLEL=FALSE!
 @numba.jit(nopython=True, parallel=False, fastmath=True)
-def get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std):
+def get_intensity_stats(raw, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std):
+#                     uint16  int64    .   int64      int64         float32        float32
     nx,ny,nz = raw.shape  # checked: nrrd loads data in (Y,X,Z) format
-    Nlabels = len(labels)
-    Npixels = len(coordinates)/3
+    Nlabels = len(volumes)
+    Nc = len(coordinates)
 
     # Loop over the objects
     for idx in range(1, Nlabels):  # ignore the first object
         base = counts_cumsum[idx-1] * 3
-        volume = int(volumes[idx])
-        intensities = np.zeros(volume)
+        volume = volumes[idx]
+        intensities = np.zeros(volume, dtype=raw.dtype)
         # Loop over the pixel of the particular object
         for i in range(volume):
             g = int(base + i*3)
             print(g+2, i, volume, base, len(coordinates))
-            assert((g+2) < len(coordinates))
-            pi = int(coordinates[g + 0])
-            pj = int(coordinates[g + 1])
-            pk = int(coordinates[g + 2])
+            assert((g+2) < Nc)
+            pi = coordinates[g + 0]
+            pj = coordinates[g + 1]
+            pk = coordinates[g + 2]
             assert((pi<nx) and (pj<ny) and (pk<nz))
             intensities[i] = raw[pi,pj,pk]
 
         # At the end of the loop for this object, compute mean, std
-        intensity_mean[idx] = np.nanmean(intensities)
-        intensity_std[idx]  = np.nanstd(intensities)
+        intensity_mean[idx] = np.nanmean(intensities.astype(np.float32))
+        intensity_std[idx]  = np.nanstd( intensities.astype(np.float32))
 
 
 # HAS TO BE PARALLEL=FALSE! PARALLEL VERSION WILL HAVE RACE CONDITION ON COUNTER
 @numba.jit(nopython=True, parallel=False, fastmath=True)
 def get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates):
     nx,ny,nz = labels3.shape  # checked: nrrd loads data in (Y,X,Z) format
-    counter = np.zeros(len(labels))
+    counter = np.zeros(len(labels), dtype=np.int64)
+    Nc = len(coordinates)
 
     # Loop over the image, once
     for k in range(nz):
@@ -48,9 +50,10 @@ def get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates):
             for i in range(nx):  # C order (row major)
                 label = labels3[i,j,k]
                 if label > 1:  # ignore the first object
-                    idx = int(label-1)
+                    idx = label-1
                     base = counts_cumsum[idx-1] * 3
-                    g = int(base + counter[idx] * 3)
+                    g = base + counter[idx] * 3
+                    assert(g < Nc)
                     coordinates[g + 0] = i
                     coordinates[g + 1] = j
                     coordinates[g + 2] = k
@@ -112,17 +115,16 @@ for file_csv in args.i:
     print("Sum of all object volumes:", sumVolumes)
     assert(sumVolumes.dtype == np.int64)
     coordinates = np.zeros((sumVolumes*3), dtype=np.int64)
-    counts_cumsum  = np.cumsum(volumes) #.astype(np.int64)
+    counts_cumsum  = np.cumsum(volumes)
     assert(counts_cumsum.dtype == np.int64)
-    assert(0)
     print("- Getting coordinates")
     get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
     #
     # --> Step 2: Compute intensity stats per object
-    intensity_mean = np.zeros(len(labels))
-    intensity_std  = np.zeros(len(labels))
+    intensity_mean = np.zeros(len(labels), dtype=np.float32)
+    intensity_std  = np.zeros(len(labels), dtype=np.float32)
     print("- Getting intensity stats")
-    get_intensity_stats(raw, labels, volumes, coordinates, intensity_mean, intensity_std)
+    get_intensity_stats(raw, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std)
 
     # Add column to dataframe
     df['IntensityAvg'] = intensity_mean
