@@ -102,6 +102,7 @@ for file_csv in args.i:
     assert(np.max(labels) == np.max(labels3))
     assert(volumes.dtype == np.int64)
     assert(labels.dtype == np.int64)
+    assert(labels3.dtype == np.int64)
     assert(0)
 
 
@@ -110,8 +111,11 @@ for file_csv in args.i:
     # --> Step 1: Get all coordinates per object
     print("Computing intensity stats ...")
     sumVolumes = np.sum(volumes)
-    coordinates = np.zeros( (sumVolumes*3) )
-    counts_cumsum  = np.cumsum(volumes).astype(np.uint64)
+    print("Sum of all object volumes:", sumVolumes)
+    assert(sumVolumes.dtype == np.int64)
+    coordinates = np.zeros((sumVolumes*3), dtype=np.int64)
+    counts_cumsum  = np.cumsum(volumes) #.astype(np.int64)
+    assert(counts_cumsum.dtype == np.int64)
     print("- Getting coordinates")
     get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
     #
