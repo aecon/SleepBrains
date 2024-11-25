@@ -27,7 +27,8 @@ echo $input_auto
 
 
 # REFERENCE ATLAS
-atlas="atlas/ABA_25um_reference_hemisphere.nrrd"
+#atlas="atlas/ABA_25um_reference_hemisphere.nrrd"
+atlas="atlas/ABA_25um_reference_hemisphere_noBulb.nrrd"
 #
 # specifically for Brain 9 - missing Cerebellum and Brain stem
 #atlas="atlas/ABA_25um_reference_hemisphere_MaskedCerebellumBrainStemVentricles_edited.nrrd"
@@ -45,12 +46,17 @@ ls $affine
 ls $bspline
 threads=32
 
-outEa=${out}/elastix_affine
-outEb=${out}/elastix_bspline
+#outEa=${out}/elastix_affine_noBulb_try12_Bin2_Gaus3D-1
+#outEa=${out}/elastix_affine_noBulb_try11 #_Bin2_Gaus3D-1
+outEa=${out}/elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20 #_
+
+outEb=${out}/elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20
+#outEb=${out}/elastix_bspline_Grid6-2-1_6ksamples_Smooth4-2-1_withBulb_try05
+
 outT=${out}/transformix
 mkdir -p "${outEa}"
 mkdir -p "${outEb}"
-mkdir -p "${outT}"
+#mkdir -p "${outT}"
 
 # registration of atlas onto the autofluorescence channel
 if [ ! -f "${outEa}/result.0.nrrd" ]; then
