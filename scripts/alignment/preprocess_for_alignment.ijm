@@ -21,7 +21,7 @@ for(i=0; i<Ndir; i++){
         // Find channel files inside the directory
         files = getFileList(input_directory + directories[i]);
         Nfiles = files.length;
-        print("Number of files in directory:", Nfiles);
+        print("  ", "Number of files in directory:", Nfiles);
 
         // Find filepath of 488 chanel
         counter = 0;
@@ -43,7 +43,7 @@ for(i=0; i<Ndir; i++){
 		// Check if file does not exist
 		output_path = input_directory + directories[i] + "prealignment_" + basename;
 		if (File.exists(output_path)){
-			print("File exists:", output_path);
+			print("  ", "File exists:", output_path);
 		}
 		else {
 
