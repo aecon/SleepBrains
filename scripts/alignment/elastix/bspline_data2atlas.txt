@@ -9,17 +9,18 @@
 
 // ********** Sampler                               // Samples are drawn on the Fixed image, then transformed to map to Moving image
 (ImageSampler "RandomCoordinate")                   // works well with Gradient Descent-based optimizers
-(NumberOfSpatialSamples 6000)                       // recommendation: 3000. Minimum recommended: 2000
+(NumberOfSpatialSamples 10000)                      // recommendation: 3000. Minimum recommended: 2000
 (NewSamplesEveryIteration "true")                   // an important option of the random samplers
 (CheckNumberOfSamples "true")                       // default:true. Metric checks if at least a fraction (default 1/4) of samples map inside moving image
 (UseRandomSampleRegion "false")                     // default:false. sampler draws samples from the entire image domain
 
 
 // ********** Interpolator
-(Interpolator "LinearInterpolator")                 // During registration use LinearInterpolator. Much faster than 1st order B-spline
-//(Interpolator "BSplineInterpolatorFloat")
-(ResampleInterpolator "FinalBSplineInterpolator")   // Recommendation: 3rd order B-spline for final deformed moving image.
-//(ResampleInterpolator "FinalBSplineInterpolatorFloat")  // for reduced memory consumption
+//(Interpolator "LinearInterpolator")                 // During registration use LinearInterpolator. Much faster than 1st order B-spline
+//(Interpolator "BSplineInterpolator")
+(Interpolator "BSplineInterpolatorFloat")
+//(ResampleInterpolator "FinalBSplineInterpolator")   // Recommendation: 3rd order B-spline for final deformed moving image.
+(ResampleInterpolator "FinalBSplineInterpolatorFloat")  // for reduced memory consumption
 (FinalBSplineInterpolationOrder 3)
 (Resampler "DefaultResampler")                      // Recommendation: DefaultResampler: generates the deformed moving image after registration
 
@@ -33,9 +34,10 @@
 //(Transform "BSplineTransform")                      // defined by uniform grid of control points: grid is defined by spacing between grid nodes
 (Transform "RecursiveBSplineTransform")             // Since elastix 4.9: new implementation, faster
 (BSplineTransformSplineOrder 3)
-(NumberOfResolutions 3)                             // specify a multi-grid schedule: For each resolution level you can define a different grid spacing.
-(FinalGridSpacingInVoxels 50 50 50 )                // final grid spacing
-(GridSpacingSchedule 6 6 6 2 2 2 1 1 1)                   // multiplication factors for all resolution levels: Number*FinalGridSpacingInVoxels
+(NumberOfResolutions 1)                             // specify a multi-grid schedule: For each resolution level you can define a different grid spacing.
+//(FinalGridSpacingInVoxels 50 50 50 )                // final grid spacing
+(FinalGridSpacingInPhysicalUnits 125 125 125)                // final grid spacing in the pixel units of the image (here micro-meters)
+(GridSpacingSchedule 1 1 1)                   // multiplication factors for all resolution levels: Number*FinalGridSpacingInVoxels
 
 
 // ********** Optimizer
@@ -47,7 +49,9 @@
 // ********** Image pyramids
 (FixedImagePyramid "FixedSmoothingImagePyramid")    // recommended with random samplers
 (MovingImagePyramid "MovingSmoothingImagePyramid")
-(ImagePyramidSchedule 4 4 4 2 2 2 1 1 1)                  // DEPENDS ON: NumberOfResolutions. sigma or each resolution = Number/2. Specifying both fixed and moving image pyramids with identical schedule
+(ImagePyramidSchedule 2 2 2)                  // DEPENDS ON: NumberOfResolutions. sigma or each resolution = Number/2. Specifying both fixed and moving image pyramids with identical schedule
+//(MovingImagePyramidSchedule 2 2 2)                  // DEPENDS ON: NumberOfResolutions. sigma or each resolution = Number/2. Specifying both fixed and moving image pyramids with identical schedule
+//(FixedImagePyramidSchedule 2 2 2)                  // DEPENDS ON: NumberOfResolutions. sigma or each resolution = Number/2. Specifying both fixed and moving image pyramids with identical schedule
 
 
 // ********** Masks                                 // Sometimes you are specifically interested in aligning only a part of the image.
@@ -55,8 +59,8 @@
 
 
 // ********** Memory consumption considerations
-(FixedInternalImagePixelType "short")               // Memory consumption: Images in elastix are internally by default as floats. Use short for low memory.
-(MovingInternalImagePixelType "short")
+(FixedInternalImagePixelType "float")               // Memory consumption: Images in elastix are internally by default as floats. Use short for low memory.
+(MovingInternalImagePixelType "float")
 
 
 // ********** Output options
