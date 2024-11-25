@@ -3,6 +3,7 @@ import sys
 import nrrd
 import mmap
 import numba
+import skimage.io
 import argparse
 import numpy as np
 import pandas as pd
@@ -39,8 +40,6 @@ file_csv = args.i
 file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
 file_raw    = find_file( (os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("segmented_")[1]).split("-morpho")[0] + ".tif.nrrd"  )
 
-assert(0)
-
 
 print("Loading brain ...")
 brain, _ = nrrd.read(file_labels)
@@ -55,21 +54,30 @@ cx      = data["Centroid.X"].to_numpy()
 cy      = data["Centroid.Y"].to_numpy()
 cz      = data["Centroid.Z"].to_numpy()
 spericity=data["Sphericity"].to_numpy()
+IntensityAvg=data["IntensityAvg"].to_numpy()
+IntensityStd=data["IntensityStd"].to_numpy()
+
+eps = np.finfo(np.float32).eps
+IntensityRatio = IntensityStd / (IntensityAvg + eps) * 100.
 
 
 print("Colouring brain ...")
 assert(len(labels) == np.max(labels))
 # - by volume
-brain_coloured_volume = np.zeros(np.shape(brain), dtype=np.int32)
-colour(brain, brain_coloured_volume, labels, volumes)
+#brain_coloured_volume = np.zeros(np.shape(brain), dtype=np.int32)
+#colour(brain, brain_coloured_volume, labels, volumes)
 # - by sphericity
-brain_coloured_sph = np.zeros(np.shape(brain), dtype=np.float32)
-colour(brain, brain_coloured_sph, labels, spericity)
+#brain_coloured_sph = np.zeros(np.shape(brain), dtype=np.float32)
+#colour(brain, brain_coloured_sph, labels, spericity)
+# - by intensity ratio
+brain_coloured_int = np.zeros(np.shape(brain), dtype=np.float32)
+colour(brain, brain_coloured_int, labels, IntensityRatio)
 
 
 # Save coloured brain
+# TODO: Save in tif is faster !
 print("Saving coloured brain ...")
-nrrd.write('%s_colouredVolume.nrrd' % file_labels, brain_coloured_volume)
-print("Saving coloured brain ...")
-nrrd.write('%s_colouredSphericity.nrrd' % file_labels, brain_coloured_sph)
+#nrrd.write('%s_colouredVolume.nrrd' % file_labels, brain_coloured_volume)
+#nrrd.write('%s_colouredSphericity.nrrd' % file_labels, brain_coloured_sph)
+skimage.io.imsave('%s_colouredIntensityRatio.tif' % file_labels, brain_coloured_int.T, plugin="tifffile", check_contrast=False)
 
