@@ -47,17 +47,19 @@ for(i=0; i<Ndir; i++){
 		Stack.setChannel(1);
 		resetMinAndMax();
 		run("Enhance Contrast", "saturated=0.35");
+		//setMinAndMax(100, 800);
 
 		Stack.setChannel(2);
 		setMinAndMax(700, 2000);
 
         // save montage
         //-tif
-        output_path = input_directory + directories[i] + suffix + ".tif";
+        brainid = directories[i].substring(0,lengthOf(directories[i])-10);
+  		output_path = input_directory + directories[i] + suffix + brainid + ".tif";
         print("  ", "Saving to:", output_path);
         saveAs("Tiff", output_path);
 		//-png
-        output_path = input_directory + directories[i] + suffix + ".png";
+        output_path = input_directory + directories[i] + suffix + brainid + ".png";
         print("  ", "Saving to:", output_path);
         saveAs("PNG", output_path);
 
