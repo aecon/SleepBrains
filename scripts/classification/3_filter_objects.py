@@ -27,9 +27,11 @@ def remove_non_plaques(labels3, is_plaque, coordinates):
                         labels3[i,j,k] = 0
                     else:
                         # GOAL 2: Collect physical coordinates of all plaque voxels 
-                        coordinates[counter, 0] = i * 3.26  # um per pixel
-                        coordinates[counter, 1] = j * 3.26
-                        coordinates[counter, 2] = k * 3.00
+                        coordinates[counter, 0] = float(i) * 3.26  # um per pixel
+                        coordinates[counter, 1] = float(j) * 3.26
+                        coordinates[counter, 2] = float(k) * 3.00
+                        counter = counter + 1
+    assert(counter == len(coordinates))
 
 
 def find_file(path):
@@ -44,8 +46,7 @@ def find_file(path):
 def load_nrrd(path, dtype):
     print("Loading:", os.path.basename(path))
     data, _ = nrrd.read(path)
-    data = np.asarray(data, dtype=dtype)
-    return data
+    return data.astype(dtype)
 
 
 class CSVdata():
@@ -116,17 +117,18 @@ if __name__ == '__main__':
         # Load 3D data
         file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
         print("Loading 3D labels ...")
-        labels3F = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
-        labels3  = labels3F.astype(np.int64)
+        labels3 = load_nrrd(file_labels, dtype=np.int64)  # MLJ output is in float32
         assert(np.max(D0.labels) == np.max(labels3))
         assert(labels3.dtype == np.int64)
 
         # Labels that are plaques
         is_plaque = np.zeros(np.shape(D0.labels))
         is_plaque[idx] = 1
+        print(np.sum(is_plaque), np.sum(idx), len(D0.labels))
 
         # Get plaques pixel coordinates
         NplaquePixels = np.sum(D0.volumes[idx])
+        print(NplaquePixels)
         coordinates_plaques = np.zeros((NplaquePixels,3), dtype=np.float32)
         remove_non_plaques(labels3, is_plaque, coordinates_plaques)
 
@@ -136,13 +138,13 @@ if __name__ == '__main__':
         generate_list_of_points(coordinates_plaques[:,0], coordinates_plaques[:,1], coordinates_plaques[:,2], output_file)
 
 
-        # EXPORT 3: labels3 with true plaques
-        print("Saving labels3 with true plaques ...")
-        output_file = file_labels + "_plaques.tif"
-        skimage.io.imsave(output_file, labels3.T, plugin="tifffile", check_contrast=False)
+# Takes too long to export (>10 minutes)
+#        # EXPORT 3: labels3 with true plaques
+#        print("Saving labels3 with true plaques ...")
+#        output_file = file_labels + "_plaques.tif"
+#        skimage.io.imsave(output_file, labels3.T, plugin="tifffile", check_contrast=False)
 
 
         del labels3
-        del labels3F
         del coordinates_plaques
 
