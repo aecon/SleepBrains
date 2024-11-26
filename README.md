@@ -26,7 +26,7 @@ AllenSDK: https://allensdk.readthedocs.io/en/latest/install.html
 ### segmentation
 - [x] Segment plaques.
 - [x] Check plaques segmentation.
-- [ ] Filter-out artifacts: Analyze Particles works on 2D. MorphoLibJ can compute per object measurements. Use them to filter out objects. Can do in ImageJ or python needed?
+- [x] Filter-out artifacts: Analyze Particles works on 2D. MorphoLibJ can compute per object measurements. Use them to filter out objects. Can do in ImageJ or python needed?
 - [ ] Segment microglia.
 - [ ] Check microglia segmentation.
 
@@ -38,8 +38,8 @@ AllenSDK: https://allensdk.readthedocs.io/en/latest/install.html
 - [x] Use transformix to align annotation atlas with regions.
 
 ### quantification
-- [ ] Count plaques per region, export in txt.
-- [ ] Code is too slow (was developed for smaller brains). Export list of plaque centers, do transformix on points list, then count inside regions.
+- [x] Count plaques per region, export in txt.
+- [x] Code is too slow (was developed for smaller brains). Export list of plaque centers, do transformix on points list, then count inside regions.
 - [ ] Make statistics plots.
 - [ ] Voxel-wise pvalues: Compute average number of plaques per voxel. -> NEED TO BE ALIGNED ON THE SAME SPACE FOR THIS..
 
