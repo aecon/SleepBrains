@@ -32,7 +32,7 @@ def find_file(path):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', type=str, required=True, help="csv, list with object measurements")
+parser.add_argument('-i', type=str, required=True, help="csv, list with object measurements, with intensity stats")
 args = parser.parse_args()
 
 
