@@ -40,18 +40,22 @@ ls $atlas
 atlas_annotation="/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/output/selected_atlas_areas_pixel25um.nrrd"
 ls $atlas_annotation
 
-affine="elastix/affine.txt"
-bspline="elastix/bspline_data2atlas.txt"
+#affine="elastix/affine.txt"
+#bspline="elastix/bspline_data2atlas.txt"
+affine="Lisa/Parameters_affine.txt"
+bspline="Lisa/Parameters_Bspline.txt"
 ls $affine
 ls $bspline
 threads=32
 
 #outEa=${out}/elastix_affine_noBulb_try12_Bin2_Gaus3D-1
 #outEa=${out}/elastix_affine_noBulb_try11 #_Bin2_Gaus3D-1
-outEa=${out}/elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20 #_
+#outEa=${out}/elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20 #_
+outEa=${out}/elastix_affine_LISA_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20 #_
 
-outEb=${out}/elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20
 #outEb=${out}/elastix_bspline_Grid6-2-1_6ksamples_Smooth4-2-1_withBulb_try05
+#outEb=${out}/elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20
+outEb=${out}/elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20
 
 outT=${out}/transformix
 mkdir -p "${outEa}"

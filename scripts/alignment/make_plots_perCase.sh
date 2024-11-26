@@ -4,10 +4,14 @@ set -eu
 parentdir="/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09"
 
 # FILES
-brains=`find $parentdir/Brain*/align/elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20 -name result.0.nrrd`
+#brains=`find $parentdir/Brain*/align/elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20 -name result.0.nrrd`
+#brains=`find $parentdir/Brain*/align/elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20 -name result.0.nrrd`
+brains=`find $parentdir/Brain*/align/elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20 -name result.0.nrrd`
 
 # OUTPUT DIRECTORY
-outdir="out_elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20"
+#outdir="out_elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20"
+#outdir="elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20"
+outdir="elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20"
 mkdir -p $outdir
 
 # RUN
