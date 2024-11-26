@@ -6,6 +6,7 @@ import argparse
 import skimage.io
 import numpy as np
 import pandas as pd
+import gc
 
 
 # DESIGNED TO RUN WITH PARALLEL=FALSE.
@@ -145,6 +146,11 @@ if __name__ == '__main__':
 #        skimage.io.imsave(output_file, labels3.T, plugin="tifffile", check_contrast=False)
 
 
+        del D0
+        del is_plaque
         del labels3
         del coordinates_plaques
+
+        gc.collect()
+
 
