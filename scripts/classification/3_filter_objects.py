@@ -134,7 +134,7 @@ if __name__ == '__main__':
         remove_non_plaques(labels3, is_plaque, coordinates_plaques)
 
 
-        # EXPORT 2: csv with plaque centroids
+        # EXPORT 2: csv with all plaque voxels
         output_file = '%s/coordinates_plaques_allvoxels.txt' % os.path.dirname(file_csv)
         generate_list_of_points(coordinates_plaques[:,0], coordinates_plaques[:,1], coordinates_plaques[:,2], output_file)
 

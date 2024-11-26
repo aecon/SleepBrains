@@ -14,10 +14,10 @@ def count_points_in_region(regions, indices, Nregions):
     nx,ny,nz = regions.shape
     Np = len(indices)
     counts_per_region = np.zeros(Nregions, dtype=np.int64)
-    for i in range(Np):
-        i = indices[i,0]
-        j = indices[i,1]
-        k = indices[i,2]
+    for pi in range(Np):
+        i = indices[pi,0]
+        j = indices[pi,1]
+        k = indices[pi,2]
         if ((i<nx) and (j<ny) and (k<nz)):  # exclude points outside Atlas space
             region_id = regions[i,j,k]
             if region_id > 0:  # if not background
@@ -36,7 +36,7 @@ def load_points(file_points):
         assert(len(p)==3)
         points[i,0] = p[0]
         points[i,1] = p[1]
-        points[i,2] = p[1]
+        points[i,2] = p[2]
     return points
 
 
@@ -71,6 +71,7 @@ if __name__ == "__main__":
         # Export to file
         basedir = os.path.dirname(os.path.dirname(os.path.dirname(file_points)))
         output_file = basedir + os.sep + "region_counts_" + os.path.basename(basedir).split("_")[0] + "_%s.txt" % args.o
+        print(output_file)
         with open(output_file, "w") as f:
             for i in range(Nregions):
                 f.write("%s %d\n" % (brain_regions_include[i], counts_per_region[i]))
