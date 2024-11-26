@@ -16,8 +16,7 @@ python 2_volume_colour.py -i PATH_TO_CSV_FILE_WITH_INTENSITY_STATS
 Use the resuts to adjust thresholds for the attributes in step (3).
 
 
-3. Filters-out non-plaques. Exports 4 files:  
-* A csv file with average plaque attributes per row.
+3. Filters-out non-plaques. Exports the following files:  
 * A txt file with a list of all plaques pixel coordinates in um.
 * A txt file with a list of per-plaque centroids in um.
 * A 3D brain, where only true plaques are labeled.  
