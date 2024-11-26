@@ -10,8 +10,8 @@ brains=`find $parentdir/Brain*/align/elastix_bspline_LISA_10k_125umGrid1_SmoothA
 
 # OUTPUT DIRECTORY
 #outdir="out_elastix_bspline_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20"
-#outdir="elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20"
-outdir="elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20"
+#outdir="out_elastix_affine_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20"
+outdir="out_elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20"
 mkdir -p $outdir
 
 # RUN
