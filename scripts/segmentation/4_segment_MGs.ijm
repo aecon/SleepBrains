@@ -25,11 +25,11 @@ for(i=0; i<Ndir; i++){
 
 	// Find filepaths of 488 and 647 chanels
 	for(j=0; j<Nfiles; j++){
-		if (files[j].contains("cropped_") && files[j].contains(ch0)) {//TODO:use startswith
+		if (files[j].startsWith("cropped_") && files[j].contains(ch0)) {//TODO:use startswith
 			file_ch0 = files[j];
 			path_ch0 = input_directory + directories[i] + files[j];
 		}
-		if (files[j].contains("cropped_") && files[j].contains(ch1)) {
+		if (files[j].startsWith("cropped_") && files[j].contains(ch1)) {
 			file_ch1 = files[j];
 			path_ch1 = input_directory + directories[i] + files[j];
 		}
@@ -42,15 +42,42 @@ for(i=0; i<Ndir; i++){
 	run("Brightness/Contrast...");
 	open(path_ch1); //print("Opening cropped highRes.tif from: " + outputDirectory + filename + "highRes_cropped.raw"); //for troubleshooting
 	titleCropped = getTitle();
-	//print(" > Duplicating stack");  //for troubleshooting
-	run("Duplicate...", "title=titleIclip duplicate");
-	titleIclip="titleIclip";
+	selectWindow(titleCropped);
 	
-	
+	//threshold 0: get rid of background
+		//duplicate image, get set threshold to distinguish background and forground
+		run("Duplicate...", "duplicate");
+		run("Threshold..."); //allows for manual thresholding
+		setMinAndMax(150, 200); //adjust B&C to capture threshold better
+		waitForUser("Foreground ID.\nMark complete foreground red. \nClick 'OK' when done.");
+		getThreshold(lower, upper);
+		setThreshold(lower, upper);
+		
+		//make forground into mask, set background as 0, foreground as 1
+		setOption("BlackBackground", true); //BG set to 0
+		run("Convert to Mask", "method=Default background=Default black");
+		run("Multiply...", "value=0.00392157 stack");  //multiply by 1/255 to scale foreground to 1
+		rename("MASK_"+titleCropped);
+		titleMask = getTitle();
+		setMinAndMax(0, 1); //adjust B&C to better visualize now binarized mask
+
+		//mutiply mask (BG = 0) with original cropped image to remove BG in original image
+		imageCalculator("Multiply create stack", titleCropped, titleMask); //excludes everything not in mask as it will be mult. by 0
+		titleForeground = getTitle();
+		selectWindow(titleForeground);
+		
+
 	//threshold 1: excluding very bright artefacts & cell clusters
+		selectWindow(titleForeground);
+		run("Duplicate...", "title=titleIclip duplicate");
+		titleIclip="titleIclip";
+		setMinAndMax(0, 1800); //adjust B&C to capture threshold better
+		
+		//tophat
+		run("Top Hat...", "radius=20 stack");
+		
 		//intensity clipping
 		selectWindow(titleIclip);
-		run("Threshold..."); //TODO: set default: don't reset range
 		waitForUser("Intensity clip for Background Normalization:\nUse the threshold to find the minimum intensity that captures bright spots/artefacts to be excluded from background estimation.\nDo so by adjusting the top bar exclusively, adjust B&C if necessary.\n \nClick 'OK' when done.");
 		Imax = getNumber("Fill in the minimum foreground intensity:", 5000);
 		//print(" > Clipping intensity"); //for troubleshooting
@@ -62,38 +89,24 @@ for(i=0; i<Ndir; i++){
 		//print(" > Duplicating stack with clipped maximum intensity"); //for troubleshooting
 		run("Duplicate...", "title=small_blur duplicate");
 		small_blur="small_blur";
-		
+
 		//foreground smoothing
 		selectWindow(small_blur);
 		smallSigma = 2;
 		run("Gaussian Blur 3D...", "x="+smallSigma+" y="+smallSigma+" z="+smallSigma); //TODO: adjustblur 10-100, pot. create mask (from alignment) and only consider pixels inside, or reflect at border
 		//print(" > Gaussian smoothing, sigma="+smallSigma+" completed."); //for troubleshooting
-
+		
 		//background smoothing
 		selectWindow(titleIclip); //TODO: pot. add laplacian to add sharper edges to make cells more easily detectable
-		bigSigma=15.25; //TODO: adjustblur 10-100, pot. create mask (from alignment) and only consider pixels inside, or reflect at border
+		bigSigma = 25; //TODO: adjustblur 10-100, pot. create mask (from alignment) and only consider pixels inside, or reflect at border
 		//print(" > Running background smoothing."); //for troubleshooting
 		run("Gaussian Blur 3D...", "x="+bigSigma+" y="+bigSigma+" z="+bigSigma);
 		//print(" > Gaussian smoothing of background (sigma="+bigSigma+") completed."); //for troubleshooting
 
-		//background bormalization
+		//background normalization
 		//print("(d) Intensity normalization."); //for troubleshooting
 		//print(" > Dividing by background."); //for troubleshooting
 		imageCalculator("Divide create 32-bit stack", small_blur, titleIclip);
-
-		//get rid of background
-		titleNorm = getTitle();
-		//print(" > Intensity normalization (dividing by background) completed."); //for troubleshooting
-		selectWindow(titleCropped);
-		run("Duplicate...", "duplicate");
-		waitForUser("Foreground ID.\nMark complete foreground red. \nClick 'OK' when done.");
-		getThreshold(lower, upper);
-		setThreshold(lower, upper);
-		setOption("BlackBackground", true);
-		run("Convert to Mask", "method=Default background=Default black");
-		rename("MASK_"+titleCropped);
-		title_mask = getTitle();
-		imageCalculator("Multiply create stack", titleNorm, title_mask);
 		titleNorm = getTitle();
 		
 		//closing background and cropped
@@ -119,6 +132,7 @@ for(i=0; i<Ndir; i++){
 		//print(" > Duplicating normalized stack."); //for troubleshooting
 		run("Duplicate...", "title=mask_inner duplicate");
 		mask_inner = "mask_inner";
+		setMinAndMax(0, 4); //adjust B&C to capture threshold better
 		
 		//threshold on normalized intensity
 		//print(" > Setting normalized intensity theshold."); //for troubleshooting
