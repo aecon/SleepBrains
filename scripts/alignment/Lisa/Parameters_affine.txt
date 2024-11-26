@@ -1,0 +1,80 @@
+//ImageTypes
+(FixedInternalImagePixelType "float")
+(FixedImageDimension 3)
+(MovingInternalImagePixelType "float")
+(MovingImageDimension 3)
+
+//Components
+(Registration "MultiResolutionRegistration")
+(FixedImagePyramid "FixedSmoothingImagePyramid")
+(MovingImagePyramid "MovingSmoothingImagePyramid")
+(Interpolator "LinearInterpolator" )
+//(Interpolator "BSplineInterpolator") //4Bspline
+(Metric "AdvancedMattesMutualInformation")
+(Optimizer "AdaptiveStochasticGradientDescent")
+(ResampleInterpolator "FinalLinearInterpolator")
+//(ResampleInterpolator "FinalBSplineInterpolator") //4Bspline
+//(Resampler "DefaultResampler") //extra
+(Transform "AffineTransform")
+
+(ErodeMask "true" ) //prev.: false
+
+(NumberOfResolutions 4) //prev.: 2
+
+(HowToCombineTransforms "Compose")
+(AutomaticTransformInitialization "true")
+(AutomaticScalesEstimation "true")
+
+(WriteTransformParametersEachIteration "false")
+(WriteResultImage "true")
+(CompressResultImage "true")
+(ResultImageFormat "nrrd")
+(WriteResultImageAfterEachResolution "false") 
+//(ShowExactMetricValue "false") //extra
+
+//Maximum number of iterations in each resolution level:
+(MaximumNumberOfIterations 4000) 
+
+//Number of grey level bins in each resolution level:
+(NumberOfHistogramBins 32 )
+//(FixedLimitRangeRatio 0.0)  //extra
+//(MovingLimitRangeRatio 0.0) //extra
+//(FixedKernelBSplineOrder 3) //extra
+//(MovingKernelBSplineOrder 3) //extra
+
+//Number of spatial samples used to compute the mutual information in each resolution level:
+(ImageSampler "RandomCoordinate")
+//(FixedImageBSplineInterpolationOrder 3) //extra
+//(UseRandomSampleRegion "false") //extra
+(NumberOfSpatialSamples 10000)
+(NewSamplesEveryIteration "true")
+(CheckNumberOfSamples "true") //prev.: false
+//(MaximumNumberOfSamplingAttempts 10) //extra
+
+//Order of B-Spline interpolation used in each resolution level:
+//(BSplineInterpolationOrder 3) //extra
+
+//Order of B-Spline interpolation used for applying the final deformation:
+//(FinalBSplineInterpolationOrder 3) //extra
+
+//Default pixel value for pixels that come from outside the picture:
+(DefaultPixelValue 0)
+
+//SP: Param_A in each resolution level. a_k = a/(A+k+1)^alpha
+//(SP_A 20.0 ) //extra
+
+//Initial Transform
+(InitialTransformParametersFileName "NoInitialTransform")
+
+//TODO: To be tested (i.e.: Are these necessary?):
+(Spacing 0.00612 0.00612 0.006)
+(Direction 1 0 0 0 1 0 0 0 1)
+(Index 0 0 0)
+(AutomaticParameterEstimation "true")
+(UseDirectionCosines "false")
+(ImagePyramidSchedule 2 2 2 )
+(FinalGridSpacingInVoxels 10 10 10 )
+(AutomaticTransformInitializationMethod "CenterOfGravity")
+(ResultImagePixelType "unsigned short")
+(WriteTransformParametersEachResolution "false")
+(WritePyramidImagesAfterEachResolution "false")
