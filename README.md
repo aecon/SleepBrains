@@ -11,7 +11,7 @@ pip install allensdk
 pip install ipykernel
 python -m ipykernel install --user --name=allensdk
 
-pip install nrrd scikit-image numpy matplotlib pandas pynrrd numba scipy
+pip install scikit-image numpy matplotlib pandas pynrrd numba scipy
 ```
 
 ```
