@@ -89,38 +89,46 @@ fi
 
 
 # Estimate inverse transform
-if [ ! -f "${outI}/result.nrrd" ]; then
+if [ ! -f "${outI}/result.0.nrrd" ]; then
     cp "${outEb}/TransformParameters.0.txt" "${outI}"/
 
-    # edit the Bspline file to perform inverse transform
-    sed -i "/(Metric/c\(Metric DisplacementMagnitudePenalty)" "${outI}/TransformParameters.inv.txt"
+    # Modify Bspline parameter file
+    cp "${bspline}" "${outI}/parameters_bspline_inv.txt"
 
-    exit
+    # edit the Bspline file to perform inverse transform
+    sed -i "/(Metric/c\(Metric DisplacementMagnitudePenalty)" "${outI}/parameters_bspline_inv.txt"
 
     # find the inverse transformation
-    ${elastix}  -out "${outI}" -m "${atlas}" -f "${atlas}" -p "${outI}/TransformParameters.inv.txt" -t0 "${outI}/TransformParameters.0.txt"  -threads $threads
+    ${elastix}  -out "${outI}" -m "${atlas}" -f "${atlas}" -p "${outI}/parameters_bspline_inv.txt" -t0 "${outI}/TransformParameters.0.txt"  -threads $threads
 fi
-
-
-exit
-
 
 
 # Transformation of a list of points: centroids
 if [ ! -f "${outTPC}/outputpoints.txt" ]; then
     points_centroids=`dirname ${input_auto}`/coordinates_plaques_centroids.txt
     ls $points_centroids
-    cp "${outEb}/TransformParameters.0.txt" "${outTPC}"/
-    ${transformix} -def "${points_centroids}" -out "${outTPC}" -tp "${outTPC}/TransformParameters.0.txt" -threads $threads
+
+    cp "${outI}/TransformParameters.0.txt" "${outTPC}"/
+
+    # edit the Transform Parameters file
+    sed -i "/(InitialTransformParameterFileName/c\(InitialTransformParameterFileName \"NoInitialTransform\" )" "${outTPC}/TransformParameters.0.txt"
+    mv "${outTPC}/TransformParameters.0.txt" "${outTPC}/TransformParameters.0ed.txt"
+
+    ${transformix} -def "${points_centroids}" -out "${outTPC}" -tp "${outTPC}/TransformParameters.0ed.txt" -threads $threads
 fi
+
 
 # Transformation of a list of points: All plaque voxels
 if [ ! -f "${outTPA}/outputpoints.txt" ]; then
     points_allvoxels=`dirname ${input_auto}`/coordinates_plaques_allvoxels.txt
     ls $points_allvoxels
-    cp "${outEb}/TransformParameters.0.txt" "${outTPA}"/
-    ${transformix} -def "${points_allvoxels}" -out "${outTPA}" -tp "${outTPA}/TransformParameters.0.txt" -threads $threads
+
+    cp "${outI}/TransformParameters.0.txt" "${outTPA}"/
+
+    # edit the Transform Parameters file
+    sed -i "/(InitialTransformParameterFileName/c\(InitialTransformParameterFileName \"NoInitialTransform\" )" "${outTPA}/TransformParameters.0.txt"
+    mv "${outTPA}/TransformParameters.0.txt" "${outTPA}/TransformParameters.0ed.txt"
+
+    ${transformix} -def "${points_allvoxels}" -out "${outTPA}" -tp "${outTPA}/TransformParameters.0ed.txt" -threads $threads
 fi
-
-
 
