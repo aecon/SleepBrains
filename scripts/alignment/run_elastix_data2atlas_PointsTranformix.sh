@@ -60,11 +60,13 @@ outEb=${out}/elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterp
 #outT=${out}/transformix
 outTPC=${out}/transformix_centroids
 outTPA=${out}/transformix_all
+outI=${out}/inverse_transform
 mkdir -p "${outEa}"
 mkdir -p "${outEb}"
 #mkdir -p "${outT}"
 mkdir -p "${outTPC}"
 mkdir -p "${outTPA}"
+mkdir -p "${outI}"
 
 # registration of atlas onto the autofluorescence channel
 if [ ! -f "${outEa}/result.0.nrrd" ]; then
@@ -85,6 +87,25 @@ fi
 #    #${transformix} -in "${atlas_annotation}" -out "${outT}" -tp "${outT}/TransformParameters.0.txt" -threads $threads
 #fi
 
+
+# Estimate inverse transform
+if [ ! -f "${outI}/result.nrrd" ]; then
+    cp "${outEb}/TransformParameters.0.txt" "${outI}"/
+
+    # edit the Bspline file to perform inverse transform
+    sed -i "/(Metric/c\(Metric DisplacementMagnitudePenalty)" "${outI}/TransformParameters.inv.txt"
+
+    exit
+
+    # find the inverse transformation
+    ${elastix}  -out "${outI}" -m "${atlas}" -f "${atlas}" -p "${outI}/TransformParameters.inv.txt" -t0 "${outI}/TransformParameters.0.txt"  -threads $threads
+fi
+
+
+exit
+
+
+
 # Transformation of a list of points: centroids
 if [ ! -f "${outTPC}/outputpoints.txt" ]; then
     points_centroids=`dirname ${input_auto}`/coordinates_plaques_centroids.txt
@@ -100,4 +121,6 @@ if [ ! -f "${outTPA}/outputpoints.txt" ]; then
     cp "${outEb}/TransformParameters.0.txt" "${outTPA}"/
     ${transformix} -def "${points_allvoxels}" -out "${outTPA}" -tp "${outTPA}/TransformParameters.0.txt" -threads $threads
 fi
+
+
 
