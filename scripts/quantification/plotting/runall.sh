@@ -26,3 +26,8 @@ do
     python coronal_per_sample.py -i "$f" -o "${outdir}/density" -s "${brainid}_allvoxels" -n 70
 done
 
+
+
+# Per region plots
+python plot_regions.py -i '/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/plotting/out/data_regions_centroids.dat' -o "out" -t "centroids"
+python plot_regions.py -i '/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/plotting/out/data_regions_allvoxels.dat' -o "out" -t "volumes"
