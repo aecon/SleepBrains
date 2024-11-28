@@ -7,8 +7,14 @@ Collect region-wise statistics.
 python generate_atlas_masks.py
 ```
 
-2. Generate text files with counts (and volumes) per region
+2. Generate text files with counts (and volumes) per region, and map pixels to 3D atlas grid
 ```
-python 2_regional_counts_volumes.py -i <PATHS TO align/transformix_centroids/outputpoints.txt files> -o "centroid"
-python 2_regional_counts_volumes.py -i <PATHS TO align/transformix_allvoxels/outputpoints.txt files> -o "allvoxels"
+python 2_regional_counts_volumes.py
+python 2_regional_counts_volumes.py
 ```
+
+3. Plotting
+```
+cd plotting
+```
+
