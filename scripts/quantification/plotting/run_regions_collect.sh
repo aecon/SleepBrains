@@ -1,5 +1,7 @@
 #!/bin/bash
-# run as: ./me.sh <list of merged_cells.vtk.out files>
+#
+# ./run_regions_collect.sh /media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/Brain*_stitched/region_counts_Brain*_centroids.txt > data_regions_centroids.dat
+# ./run_regions_collect.sh /media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/Brain*_stitched/region_counts_Brain*_all.txt > data_regions_allvoxels.dat
 
 set -eu
 
