@@ -75,7 +75,10 @@ stads2 = np.std( g2, axis=0)
 fig, ax = plt.subplots(figsize=(9,5))
 ax.bar(x_pos-0.25, means1, yerr=stads1, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='m', label="Control")
 ax.bar(x_pos,      means2, yerr=stads2, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='c', label="Low dose")
-ax.set_ylabel(r'Cell volume ($mm^3$)', fontsize=13)
+if args.t == "centroids":
+    ax.set_ylabel(r'Counts', fontsize=13)
+elif args.t == "volumes":
+    ax.set_ylabel(r'Total volume ($mm^3$)', fontsize=13)
 ax.set_xticks(x_pos)
 ax.set_xticklabels(regions, fontsize=13)
 ax.tick_params(axis='y', which='major', labelsize=13)
