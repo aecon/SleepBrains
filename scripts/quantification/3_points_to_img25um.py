@@ -27,8 +27,8 @@ if __name__ == "__main__":
     parser.add_argument('-t', type=str, required=True, help="short or long")
     args = parser.parse_args()
 
-    #file_atlas = '/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/alignment/atlas/selected_atlas_areas_pixel25um_noBulb.nrrd'
-    file_atlas = "/Users/athena/Downloads/selected_atlas_areas_pixel25um_noBulb.nrrd"
+    file_atlas = '/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/alignment/atlas/selected_atlas_areas_pixel25um_noBulb.nrrd'
+    #file_atlas = "/Users/athena/Downloads/selected_atlas_areas_pixel25um_noBulb.nrrd"
     pixel_size = 25  # microns per pixel
 
     # Load atlas
