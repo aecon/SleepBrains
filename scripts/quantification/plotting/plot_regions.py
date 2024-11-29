@@ -34,8 +34,9 @@ x_pos = np.arange(len(regions))
 
 my_cmap = plt.cm.get_cmap('plasma')
 
-group1=["Brain1","Brain3","Brain4","Brain5","Brain7"]
-group2=["Brain11","Brain12","Brain13","Brain14","Brain15","Brain16"]
+#group1=["Brain9","Brain6","Brain10","Brain7","Brain12","Brain1","Brain16","Brain2"]
+group1=["Brain7","Brain12","Brain1","Brain16"]
+group2=["Brain13","Brain4","Brain14","Brain5","Brain3","Brain11","Brain15"]
 
 
 # Compute mean/std of segmented volume per group
@@ -73,8 +74,8 @@ stads2 = np.std( g2, axis=0)
 # plt.savefig("%s/pic_per_region_counts_group_averages.png"%args.o, transparent=True)
 
 fig, ax = plt.subplots(figsize=(9,5))
-ax.bar(x_pos-0.25, means1, yerr=stads1, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='m', label="Control")
-ax.bar(x_pos,      means2, yerr=stads2, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='c', label="Low dose")
+ax.bar(x_pos-0.25, means1, yerr=stads1, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='m', label="Adrb1")
+ax.bar(x_pos,      means2, yerr=stads2, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='c', label="Dnmt1")
 if args.t == "centroids":
     ax.set_ylabel(r'Counts', fontsize=13)
 elif args.t == "volumes":
