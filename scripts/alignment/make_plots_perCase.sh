@@ -25,6 +25,7 @@ for brain in ${brains}; do
 
     logfile=$d0/elastix.log
     atlas=`cat $logfile  | grep "\-f" | awk 'NR==2' | awk -F  '-f' '{print $2}' | awk '{ gsub (" ", "", $0); print}'`
+    #atlas=atlas/ABA_25um_annotation_hemisphere_noBulb.nrrd
 
     ls $brain
     ls $atlas

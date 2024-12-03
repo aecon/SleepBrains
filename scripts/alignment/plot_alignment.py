@@ -31,40 +31,48 @@ print(np.shape(cells))
 
 
 # visuals (adjusted from auto in Fiji)
-Vmin=50
+Vmin=100
 Vmax=800
+
+# for reference atlas
 atlas[atlas<20] = 0
 atlas[atlas>250] = 250
 
 
 # plot coronal view
-Nc=9
+Nc=8
 Nr=1
-fig,ax = plt.subplots(Nr,Nc, figsize=(36,4), constrained_layout=True)
-slices = [50, 100, 150, 200, 250, 300, 350, 400, 450]
-for ic in range(9):
+fig,ax = plt.subplots(Nr,Nc, figsize=(16,3), facecolor='black')
+slices = [50, 100, 150, 200, 250, 300, 350, 400]
+for ic in range(Nc):
     k = int(ic)
     i = int(slices[k])
     pa = ax[ic].imshow(cells[:,i,:],interpolation='nearest',cmap=cm.gray, vmin=Vmin, vmax=Vmax)
     pb = ax[ic].contour(np.log10(atlas[:,i,:]+1), levels=10, linewidths=0.5, linestyles='-', colors='m')
+    #pan= ax[ic].contour(atlas[:,i,:], colors='m', levels=[0], linewidths=0.2) # outline
+    #pan= ax[ic].contour(atlas[:,i,:], colors='m', levels=np.linspace(50,2001,10), linewidths=0.2) # outline
     ax[ic].set_axis_off()
+    ax[ic].set_facecolor("white")
 plt.subplots_adjust(wspace=0, hspace=0)
-plt.savefig("%s/%s_1a.png" % (args.o, args.s), transparent=True, pad_inches=0)
+plt.savefig("%s/%s_1a.png" % (args.o, args.s), bbox_inches='tight', pad_inches=0, transparent=False)
 plt.close()
 
 
 # plot sagittal view
 Nc=9
 Nr=1
-fig,ax = plt.subplots(Nr,Nc, figsize=(36,4), constrained_layout=True)
+fig,ax = plt.subplots(Nr,Nc, figsize=(16,3), facecolor='black')
 slices = np.arange(30,228,20)
 for ic in range(9):
     k = int(ic)
     i = int(slices[k])
     pa = ax[ic].imshow(cells[:,:,i],interpolation='nearest',cmap=cm.gray, vmin=Vmin, vmax=Vmax)
     pb = ax[ic].contour(np.log10(atlas[:,:,i]+1), levels=10, linewidths=0.5, linestyles='-', colors='m')
+    #pan= ax[ic].contour(atlas[:,:,i], colors='m', levels=[0], linewidths=0.2) # outline
+    #pan= ax[ic].contour(atlas[:,:,i], colors='m', levels=np.linspace(50,2001,10), linewidths=0.2) # outline
     ax[ic].set_axis_off()
+    ax[ic].set_facecolor("white")
 plt.subplots_adjust(wspace=0, hspace=0)
-plt.savefig("%s/%s_1b.png" % (args.o, args.s), transparent=True, pad_inches=0)
+plt.savefig("%s/%s_1b.png" % (args.o, args.s), bbox_inches='tight', pad_inches=0, transparent=False)
 plt.close()
 
