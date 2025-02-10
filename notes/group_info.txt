@@ -1,0 +1,25 @@
+BrainID	Group
+Group 1:
+01	EEG AD Adrb1 group at 11 weeks
+07	EEG AD Adrb1 group at 11 weeks
+10	EEG AD Adrb1 group at 11 weeks
+12	EEG AD Adrb1 group at 11 weeks
+16	EEG AD Adrb1 group at 11 weeks
+Group 2:
+03	EEG AD Dnmt1 group at 11 weeks
+04	EEG AD Dnmt1 group at 11 weeks
+05	EEG AD Dnmt1 group at 11 weeks
+11	EEG AD Dnmt1 group at 11 weeks
+13	EEG AD Dnmt1 group at 11 weeks
+14	EEG AD Dnmt1 group at 11 weeks
+15	EEG AD Dnmt1 group at 11 weeks
+
+---
+Excluded from analysis
+Group 1:
+02	EEG AD Adrb1 group at 11 weeks -- No plaques: excluded from analysis
+06	EEG AD Adrb1 group at 11 weeks -- No plaques: excluded from analysis
+09	EEG AD Adrb1 group at 11 weeks -- Cerebellum lost while mounting + Large bubble near brain center: excluded from analysis
+Group 2:
+08	EEG AD Dnmt1 group at 11 weeks -- SPIM issue: excluded from analysis
+
