@@ -43,7 +43,8 @@ args = parser.parse_args()
 for file_raw in args.i:
     print("Processing:", file_raw)
 
-    # Set paths
+    # TODO
+    # Set paths: Change if needed
     file_labels = os.path.dirname(file_raw) + os.sep + "labelled_segmented_"  + os.path.basename(file_raw).split(".tif")[0] + ".nrrd"
     
     # Check if files exist
@@ -64,8 +65,9 @@ for file_raw in args.i:
     edited_brain[:,:,:] = raw[:,:,:]
     remove_plaques(raw, labeled_brain, edited_brain)
     
+    # TODO
     # Save edited brain
     print("Writing edited brain ...")
-    outputfile = '%s_forAlignment.tif' % file_raw
+    outputfile = '%s_forAlignment.tif' % file_raw   # Might need change
     skimage.io.imsave(outputfile, edited_brain.T, plugin="tifffile", check_contrast=False)
 
