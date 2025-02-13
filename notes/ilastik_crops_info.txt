@@ -1,0 +1,9 @@
+Summary of observed particularities
+
+# Channel 488:
+
+BrainID
+01: bright and dim meninges at slice 1053, striatum stripes, brightest brain in group 1
+07: small cracks at slice  406, high stitching tile contrast at slice 966, cuts in sample upper brain at slice 616
+12: bright and long vessels at slice 206, both messy and clear squickly in triangular hole, generally dimmer than brains 1 and 7
+16: has enlarged trianglular hole
