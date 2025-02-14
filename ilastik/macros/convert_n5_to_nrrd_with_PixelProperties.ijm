@@ -1,8 +1,9 @@
 //input_directory = "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/test_ilastik/";
-input_directory = "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/ilastik/ilastik_probabilities/predictions_488_allBrains_ilp-v4/";
+input_directory = "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/ILASTIK/predictions_488_allBrains_ilp-v4/";
 
 files = getFileList(input_directory);
 Nfiles = files.length;
+setBatchMode(true);
 for (i=0; i<Nfiles; i++) {
 	if (files[i].contains("cropped_original_Brain")) {
 		print(files[i]);
