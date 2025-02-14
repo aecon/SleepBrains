@@ -1,5 +1,8 @@
 # Quantification
 
+
+## Pipieline after Filter-based approach
+
 Process:  
 
 1. Computes per-object intensity stats. Exports intensity columns in new csv files.  
@@ -25,3 +28,16 @@ Usage: Adjust attribute thresholds based on step (2).
 python 3_filter_objects.py -i <PATHS TO CSV FILES WITH INTENSITY STATS>
 ```
 
+
+## Pipeline after Machine Learning approach (ilastik)
+
+1. Run ImagejJ macro:
+```
+`/media/user/SSD1/Athena/SOURCE/SleepBrains/ilastik/macros/n5_to_csv_csv.ijm`
+```
+- Change the path to the folder containing the n5 files.   
+- ilp file 488-v4 exports the channels and z-frames flipped. The macro swaps them.  
+- ilp 647 exports the z-stack correctly. The macro should be edited to not flip the stack when converting to nrrd.
+* Reads nrrd, and performs object classification using per-object probability and size/shape metrics.
+* Exports the centroids and the volumes of each plaque in a csv file.
+* Deletes the temporary nrrd file.
