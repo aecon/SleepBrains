@@ -40,7 +40,6 @@ python 3_filter_objects.py -i <PATHS TO CSV FILES WITH INTENSITY STATS>
 - ilp 647 exports the z-stack correctly. The macro should be edited to not flip the stack when converting to nrrd.
 * Reads nrrd, and performs object classification using per-object probability and size/shape metrics.
 * Exports the centroids and the volumes of each plaque in a csv file.
-* (Deletes the temporary nrrd file. - TODO)
 
 2. Filter-out false positives:  
 ```

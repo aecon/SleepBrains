@@ -1,0 +1,145 @@
+import os
+import sys
+import nrrd
+import mmap
+import numba
+import argparse
+import numpy as np
+import pandas as pd
+
+
+# ALSO HAS TO BE RUN WITH PARALLEL=FALSE!
+@numba.jit(nopython=True, parallel=False, fastmath=True)
+def get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std):
+#                     float32  int64       int64      int64         float32        float32
+    nx,ny,nz = pmap.shape  # checked: nrrd loads data in (Y,X,Z) format
+    Nlabels = len(volumes)
+    Nc = len(coordinates)
+
+    # Loop over the objects
+    for idx in range(1, Nlabels):  # ignore the first object
+        base = counts_cumsum[idx-1] * 3
+        volume = volumes[idx]
+        intensities = np.zeros(volume, dtype=pmap.dtype)
+        # Loop over the pixel of the particular object
+        for i in range(volume):
+            g = int(base + i*3)
+            assert((g+2) < Nc)
+            pi = coordinates[g + 0]
+            pj = coordinates[g + 1]
+            pk = coordinates[g + 2]
+            assert((pi<nx) and (pj<ny) and (pk<nz))
+            intensities[i] = pmap[pi,pj,pk]
+
+        # At the end of the loop for this object, compute mean, std
+        intensity_mean[idx] = np.nanmean(intensities.astype(np.float32))
+        intensity_std[idx]  = np.nanstd( intensities.astype(np.float32))
+
+
+# HAS TO BE PARALLEL=FALSE! PARALLEL VERSION WILL HAVE RACE CONDITION ON COUNTER
+@numba.jit(nopython=True, parallel=False, fastmath=True)
+def get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates):
+    nx,ny,nz = labels3.shape  # checked: nrrd loads data in (Y,X,Z) format
+    counter = np.zeros(len(labels), dtype=np.int64)
+    Nc = len(coordinates)
+
+    # Loop over the image, once
+    for k in range(nz):
+        for j in range(ny):
+            for i in range(nx):  # C order (row major)
+                label = labels3[i,j,k]
+                if label > 1:  # ignore the first object
+                    idx = label-1
+                    base = counts_cumsum[idx-1] * 3
+                    g = base + counter[idx] * 3
+                    assert(g < Nc)
+                    coordinates[g + 0] = i
+                    coordinates[g + 1] = j
+                    coordinates[g + 2] = k
+                    counter[idx] = counter[idx] + 1
+    for i in range(1,len(labels)):
+        assert(counter[i] == volumes[i])
+
+
+def find_file(path):
+    if os.path.exists(path):
+        print("Found file:", path)
+    else:
+        print("File not found:", path)
+        sys.exit()
+    return path
+
+
+def load_nrrd(path, dtype):
+    print("Loading:", os.path.basename(path))
+    data, _ = nrrd.read(path)
+    data = np.asarray(data, dtype=dtype)
+    return data
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', type=str, required=True, nargs='+', help="csv, list with object measurements")
+    args = parser.parse_args()
+
+    # Find paths
+    for file_csv in args.i:
+        print("\nProcessing:", file_csv)
+        file_labels = find_file( os.path.dirname(file_csv) + os.sep + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
+        file_pmap   = find_file( os.path.dirname(file_csv) + os.sep + (os.path.basename(file_csv).split("labelled_")[1]).split("-morpho")[0] + ".nrrd" )
+
+        # Load 3D data
+        pmap     = load_nrrd(file_pmap, dtype=np.float32)       # pmap is in float [0,1]
+        labels3F = load_nrrd(file_labels, dtype=np.float32)  # MLJ output is in float32
+        labels3  = labels3F.astype(np.int64)
+
+        # Load csv data
+        df = pd.read_csv(file_csv)
+        labels  = df["Label"].to_numpy()
+        volumes = df["VoxelCount"].to_numpy()  # In Voxels
+
+        # Checks
+        assert(len(labels) == np.max(labels))
+        assert(np.max(labels) == np.max(labels3))
+        assert(volumes.dtype == np.int64)
+        assert(labels.dtype == np.int64)
+        assert(labels3.dtype == np.int64)
+
+        # Compute object intensity stats (mean, std)
+        #
+        # --> Step 1: Get all coordinates per object
+        print("Computing intensity stats ...")
+        sumVolumes = np.sum(volumes)
+        print("Sum of all object volumes:", sumVolumes)
+        assert(sumVolumes.dtype == np.int64)
+        coordinates = np.zeros((sumVolumes*3), dtype=np.int64)
+        counts_cumsum  = np.cumsum(volumes)
+        assert(counts_cumsum.dtype == np.int64)
+        print("- Getting coordinates")
+        get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
+        #
+        # --> Step 2: Compute intensity stats per object
+        intensity_mean = np.zeros(len(labels), dtype=np.float32)
+        intensity_std  = np.zeros(len(labels), dtype=np.float32)
+        print("- Getting intensity stats")
+        get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std)
+
+        # Add column to dataframe
+        df['IntensityAvg'] = intensity_mean
+        df['IntensityStd'] = intensity_std
+
+        # Export to csv
+        print("Exporting to csv ...")
+        output_path = file_csv + "_withIntensity.csv"
+        df.to_csv(output_path, index=False)
+
+        del labels3
+        del pmap
+        del coordinates
+        del labels
+        del volumes
+        del counts_cumsum
+        del intensity_mean
+        del intensity_std
+
