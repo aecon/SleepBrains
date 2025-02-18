@@ -32,7 +32,21 @@ scripts/pre-process/1_preprocess.ijm - WIP!!
 ```
 
 **2. Alignment**  
-TODO.  
+* 1. Generate pre-processes file to use for alignment.  
+!! IMPORTANT: Pixel dimensions must be correct !!
+```
+scripts/alignment/preprocess_for_alignment.ijm
+```
+* 2. Alignment:  
+Check paths to atlas (without bulb), atlas pixel size (25um), paths to affine and B-spline parameter files.
+```
+scripts/alignment//runall.sh
+```
+* 3. Plotting:
+```
+scripts/alignment/make_plots_perCase.sh
+```
+
 
 **3. Segmentation**  
 * 1. Use ilastik to get a probability map for plaques and microglia.  
