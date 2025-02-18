@@ -8,12 +8,14 @@ Process:
 1. Computes per-object intensity stats. Exports intensity columns in new csv files.  
 Usage:  
 ```
+cd after_filters
 pyton 1_add_label_intensity.py -i <PATHS TO CSV FILES>
 ```
 
 2. Colours candidate plaques by different attributes: volume, sphericity, ratio of intensity std/mean.   
 Usage: RUN FOR A SINGLE TEST BRAIN, NO NEED TO RUN FOR ALL BRAINS.  
 ```
+cd after_filters
 python 2_volume_colour.py -i PATH_TO_CSV_FILE_WITH_INTENSITY_STATS
 ```
 Use the resuts to adjust thresholds for the attributes in step (3).
@@ -25,6 +27,7 @@ Use the resuts to adjust thresholds for the attributes in step (3).
 * A 3D brain, where only true plaques are labeled.  
 Usage: Adjust attribute thresholds based on step (2).  
 ```
+cd after_filters
 python 3_filter_objects.py -i <PATHS TO CSV FILES WITH INTENSITY STATS>
 ```
 
@@ -42,7 +45,5 @@ python 3_filter_objects.py -i <PATHS TO CSV FILES WITH INTENSITY STATS>
 * Exports the centroids and the volumes of each plaque in a csv file.
 
 2. Filter-out false positives:  
-```
-filter_objects_ML.py
-```
-WIP.
+Do steps 1,2,3 from above but use the scripts inside the folder `after_ML`.
+
