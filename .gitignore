@@ -2,3 +2,4 @@
 *.tif
 *__pycache__
 out*
+*img3D
