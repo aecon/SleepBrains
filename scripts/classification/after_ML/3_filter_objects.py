@@ -84,6 +84,16 @@ def generate_list_of_points(X, Y, Z, output_file):
             f.write("%f %f %f\n" % (X[i], Y[i], Z[i]))
 
 
+def generate_list_of_points_with_properties(X, Y, Z, VOL, PAVG, output_file):
+    # Generates a list of points according to the
+    # input for elastix's transformix
+    Np = len(X)
+    with open(output_file, "w") as f:
+        f.write("X(um),Y(um),Z(um),NumberOfVoxels, AverageProbability\n")
+        for i in range(Np):       
+            f.write("%f %f %f %d %f\n" % (X[i], Y[i], Z[i], VOL[i], PAVG[i]))
+
+
 
 
 if __name__ == '__main__':
@@ -92,10 +102,11 @@ if __name__ == '__main__':
     parser.add_argument('-i', type=str, required=True, nargs='+', help="csv, list with object measurements")
     args = parser.parse_args()
 
-    # Threshold for object filtering
-    THRES_s = 0.2    # sphericity threshold, should be greater than
-    THRES_v = 40000  # volume count threshold, should be less than
-    THRES_i = 15     # intensity threholds, should be greater than
+    # Thresholds
+    # THRES_s = 0    # sphericity threshold, should be greater than. Not used. Merged plaques have low sphericity and are wrongly excluded.
+    THRES_vmax = 10000  # volume count threshold, should be less than
+    THRES_vmin = 2   # volume count threshold, should be more or equal than
+    THRES_i = 10     # intensity threholds, should be greater than
 
 
     for file_csv in args.i:
@@ -108,37 +119,42 @@ if __name__ == '__main__':
         assert(D0.labels.dtype == np.int64)
 
         # Keep only plaque objects
-        idx = (D0.sphericity>THRES_s) * (D0.volumes<THRES_v) * (D0.intensity_ratio>THRES_i)
+        idx = (D0.volumes<THRES_vmax) * (D0.volumes>=THRES_vmin) * (D0.intensity_ratio>=THRES_i)
 
-        # EXPORT 1: List of plaque centroids
-        output_file = '%s/coordinates_plaques_centroids.txt' % os.path.dirname(file_csv)
+        # EXPORT 1: List of plaque centroids - for transformation (alignment)
+        basename = (os.path.basename(file_csv).split("_Probabi")[0]).split("original_")[1]
+        output_file = '%s/coordinates_%s_centroids.txt' % (os.path.dirname(file_csv), basename)
         generate_list_of_points(D0.cx[idx], D0.cy[idx], D0.cz[idx], output_file)
 
-
-        # Load 3D data
-        file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
-        print("Loading 3D labels ...")
-        labels3 = load_nrrd(file_labels, dtype=np.int64)  # MLJ output is in float32
-        assert(np.max(D0.labels) == np.max(labels3))
-        assert(labels3.dtype == np.int64)
-
-        # Labels that are plaques
-        is_plaque = np.zeros(np.shape(D0.labels))
-        is_plaque[idx] = 1
-        print(np.sum(is_plaque), np.sum(idx), len(D0.labels))
-
-        # Get plaques pixel coordinates
-        NplaquePixels = np.sum(D0.volumes[idx])
-        print(NplaquePixels)
-        coordinates_plaques = np.zeros((NplaquePixels,3), dtype=np.float32)
-        remove_non_plaques(labels3, is_plaque, coordinates_plaques)
+        # EXPORT 2: List of plaque centroids AND properties: Volume and Average Probability
+        output_file = '%s/coordinates_%s_centroids_with_measurements.csv' % (os.path.dirname(file_csv), basename)
+        generate_list_of_points_with_properties(D0.cx[idx], D0.cy[idx], D0.cz[idx], D0.volumes[idx], D0.intensity_ratio[idx], output_file)
 
 
-        # EXPORT 2: csv with all plaque voxels
-        output_file = '%s/coordinates_plaques_allvoxels.txt' % os.path.dirname(file_csv)
-        generate_list_of_points(coordinates_plaques[:,0], coordinates_plaques[:,1], coordinates_plaques[:,2], output_file)
-
-
+#        # Load 3D data
+#        file_labels = find_file( os.path.dirname(file_csv) + os.sep + "labelled_" + os.path.basename(file_csv).split("-morpho")[0] + ".nrrd" )
+#        print("Loading 3D labels ...")
+#        labels3 = load_nrrd(file_labels, dtype=np.int64)  # MLJ output is in float32
+#        assert(np.max(D0.labels) == np.max(labels3))
+#        assert(labels3.dtype == np.int64)
+#
+#        # Labels that are plaques
+#        is_plaque = np.zeros(np.shape(D0.labels))
+#        is_plaque[idx] = 1
+#        print(np.sum(is_plaque), np.sum(idx), len(D0.labels))
+#
+#        # Get plaques pixel coordinates
+#        NplaquePixels = np.sum(D0.volumes[idx])
+#        print(NplaquePixels)
+#        coordinates_plaques = np.zeros((NplaquePixels,3), dtype=np.float32)
+#        remove_non_plaques(labels3, is_plaque, coordinates_plaques)
+#
+#
+#        # EXPORT 2: csv with all plaque voxels
+#        output_file = '%s/coordinates_plaques_allvoxels.txt' % os.path.dirname(file_csv)
+#        generate_list_of_points(coordinates_plaques[:,0], coordinates_plaques[:,1], coordinates_plaques[:,2], output_file)
+#
+#
 # Takes too long to export (>10 minutes)
 #        # EXPORT 3: labels3 with true plaques
 #        print("Saving labels3 with true plaques ...")
@@ -147,9 +163,9 @@ if __name__ == '__main__':
 
 
         del D0
-        del is_plaque
-        del labels3
-        del coordinates_plaques
+#        del is_plaque
+#        del labels3
+#        del coordinates_plaques
 
         gc.collect()
 
