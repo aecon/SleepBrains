@@ -40,21 +40,56 @@ for (i=0; i<Nfiles; i++) {
 		
         // Add probabilities from the two channels (big and small microglia)
 		imageCalculator("Add create 32-bit stack", "ch1","ch2");
-		titleP = getTitle();
+		title_pmap = getTitle();
 		
 		selectImage("ch1");
 		close();
 		selectImage("ch2");
 		close();
+		
+		selectWindow(title_pmap);
 
-		// Save as nrrd
-		selectImage(titleP);
+		// Threshold
+		run("Duplicate...", "duplicate");
+		setThreshold(0.2, 10);  // remove as few true plaques as possible, while keeping them separated..
+		setOption("BlackBackground", true);
+		run("Convert to Mask", "method=Default background=Default black");
+		title_mask = getTitle();
+
+		//run connected components labelling via MLJ, save labelled image
+		run("Connected Components Labeling", "connectivity=26 type=float");
+		rename("labelled_"+basename);
+		titleLabelled = getTitle();
+		
+		//get information on labelled objects (sphericity, etc.), save in .csv
+		run("Analyze Regions 3D", "voxel_count volume surface_area sphericity centroid max._inscribed surface_area_method=[Crofton (13 dirs.)] euler_connectivity=26");
+		MLJ_suffix = "-morpho";
+		MLJ_results = titleLabelled + MLJ_suffix;		
+		
+		// Output directory
 		outdir = input_directory + "nrrd/";
 		File.makeDirectory(outdir);
+		
+		// save csv
+		selectWindow(MLJ_results);
+		outpath = outdir + MLJ_results + ".csv";
+		saveAs("Results", outpath);
+		
+		// original pmap
+		selectWindow(title_pmap);
 		outpath = outdir + basename + ".nrrd";
 		print("Saving to:", outpath);
 		run("Nrrd ... ", "nrrd="+outpath);
 
+		// labeled image
+		selectWindow(titleLabelled);
+		outpath = outdir + "labelled_" + basename + ".nrrd";
+		print("Saving to:", outpath);
+		run("Nrrd ... ", "nrrd="+outpath);
+		
+		//cleanup windows
 		close("*");
+		selectWindow(MLJ_results + ".csv");
+		run("Close");
 	}
 }

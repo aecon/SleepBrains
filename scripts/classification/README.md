@@ -36,10 +36,18 @@ python 3_filter_objects.py -i <PATHS TO CSV FILES WITH INTENSITY STATS>
 
 ## Pipeline after Machine Learning approach (ilastik)
 
-1. Run ImagejJ macro:
+1. Run ImagejJ macro to convert from .n5 to .nrrd AND find connected components and per-object properties using MorphoLibJ:
 ```
-`/media/user/SSD1/Athena/SOURCE/SleepBrains/ilastik/macros/n5_to_csv_csv.ijm`
+after_ML/n5_to_csv_plaques.ijm (currently swaps channels and nSlices)
+after_ML/n5_to_csv_microlgia.ijm (adds two probability channels, does not swap)
 ```
+
+Extra files to do only n5 to nrrd conversion:
+```
+n5_to_nrrd_plaques.ijm` for plaques (currently swaps channels and nSlices)
+n5_to_nrrd_microglia.ijm` for microglia (does not swap)
+```
+
 - Change the path to the folder containing the n5 files.   
 - ilp file 488-v4 exports the channels and z-frames flipped. The macro swaps them.  
 - ilp 647 exports the z-stack correctly. The macro should be edited to not flip the stack when converting to nrrd.
