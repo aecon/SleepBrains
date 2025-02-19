@@ -72,7 +72,7 @@ for (i=0; i<Nfiles; i++) {
 		
 		// save csv
 		selectWindow(MLJ_results);
-		outpath = outdir + MLJ_results + ".csv";
+		outpath = outdir + MLJ_results + ".csv";  // need the volume per cluster to exclude the ones containing only  voxel
 		saveAs("Results", outpath);
 		
 		// original pmap
