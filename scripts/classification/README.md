@@ -21,6 +21,8 @@ python 2_volume_colour.py -i PATH_TO_CSV_FILE_WITH_INTENSITY_STATS
 Use the resuts to adjust thresholds for the attributes in step (3).
 
 
+
+
 3. Filters-out non-plaques. Exports the following files:  
 * A txt file with a list of all plaques pixel coordinates in um.
 * A txt file with a list of per-plaque centroids in um.
@@ -45,5 +47,11 @@ python 3_filter_objects.py -i <PATHS TO CSV FILES WITH INTENSITY STATS>
 * Exports the centroids and the volumes of each plaque in a csv file.
 
 2. Filter-out false positives:  
-Do steps 1,2,3 from above but use the scripts inside the folder `after_ML`.
+Do steps 1,2,3 from above but use the scripts inside the folder `after_ML`.  
+
+
+2b. Use `2b_statistics.py` to generate plots with statistics about the size, probability ratio and sphericity of the objects.
+```
+python 2b_statistics.py -i PATH_TO_CSV_FILE_WITH_INTENSITY_STATS
+```
 
