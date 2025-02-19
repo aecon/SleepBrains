@@ -2,13 +2,12 @@
 set -eu
 
 
-outdir="out"
+outdir="out_2025-02"
 mkdir -p $outdir
 
 
 ## Collect per-region counts
-#./run_regions_collect.sh /media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/Brain*_stitched/region_counts_Brain*_centroids.txt > $outdir/data_regions_centroids.dat
-#./run_regions_collect.sh /media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/Brain*_stitched/region_counts_Brain*_all.txt > $outdir/data_regions_allvoxels.dat
+#./run_regions_collect.sh /media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/Brain*_stitched/region_counts_488Brain*_centroids.txt > $outdir/data_regions_488_2025-02.dat
 
 
 ## Generate coronal with counts plots per sample
@@ -29,5 +28,5 @@ mkdir -p $outdir
 
 
 # Per region plots
-python plot_regions.py -i '/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/plotting/out/data_regions_centroids.dat' -o "out" -t "centroids"
-python plot_regions.py -i '/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/plotting/out/data_regions_allvoxels.dat' -o "out" -t "volumes"
+python plot_regions.py -i "${outdir}/data_regions_488_2025-02.dat" -o "${outdir}" -t "centroids"
+

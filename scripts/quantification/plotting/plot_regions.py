@@ -17,7 +17,7 @@ if not os.path.exists(args.o):
 # Sample "Hippocamus", "Cortex", "Thalamus", "Hypothalamus", "Midbrain", "Brain stem"
 data    = np.loadtxt(args.i, skiprows=1, usecols=(1,2,3,4,5,6))
 headers = np.loadtxt(args.i, skiprows=1, usecols=(0), dtype=str)
-
+print(data)
 
 dx=3.26*1.e-3
 dz=3.00*1.e-3
@@ -59,23 +59,19 @@ for i,s in enumerate(group2):
 means2 = np.mean(g2, axis=0)
 stads2 = np.std( g2, axis=0)
 
-# fig, ax = plt.subplots(figsize=(9,5))
-# #ax.bar(x_pos-0.25, means1, yerr=stads1, align='edge', width=0.2, capsize=7, color='m', label="Toxofilin-Cre")
-# #ax.bar(x_pos,      means2, yerr=stads2, align='edge', width=0.2, capsize=7, color='c', label="Gra16-Cre")
-# #ax.bar(x_pos+0.25, means3, yerr=stads3, align='edge', width=0.2, capsize=7, color='#ffea00', label="saline")
-# ax.bar(x_pos-0.25, means1, align='edge', width=0.2, edgecolor='k', linewidth=0.5, color='m', label="Control")
-# ax.bar(x_pos,      means2, align='edge', width=0.2, edgecolor='k', linewidth=0.5, color='c', label="Low dose")
-# ax.bar(x_pos+0.25, means3, align='edge', width=0.2, edgecolor='k', linewidth=0.5, color='#ffea00', label="High dose")
-# ax.set_ylabel(r'Cell volume ($mm^3$)', fontsize=13)
-# ax.set_xticks(x_pos)
-# ax.set_xticklabels(regions, fontsize=13)
-# ax.tick_params(axis='y', which='major', labelsize=13)
-# plt.legend(prop={'size': 11})
-# plt.savefig("%s/pic_per_region_counts_group_averages.png"%args.o, transparent=True)
-
+# Plot
 fig, ax = plt.subplots(figsize=(9,5))
 ax.bar(x_pos-0.25, means1, yerr=stads1, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='m', label="Adrb1")
 ax.bar(x_pos,      means2, yerr=stads2, align='edge', width=0.2, capsize=7, edgecolor='k', linewidth=0.5, color='c', label="Dnmt1")
+for i,s in enumerate(group1):
+    idx1 = np.where(headers==s)[0]
+    o = data[idx1,:][0] * vp
+    ax.scatter(x_pos-0.25+0.1, o, color='k', alpha=0.5, s=20)
+for i,s in enumerate(group2):
+    idx1 = np.where(headers==s)[0]
+    o = data[idx1,:][0] * vp
+    ax.scatter(x_pos+0.1, o, color='k', alpha=0.5, s=20)
+ 
 if args.t == "centroids":
     ax.set_ylabel(r'Counts', fontsize=13)
 elif args.t == "volumes":
