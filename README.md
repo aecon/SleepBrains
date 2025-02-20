@@ -31,7 +31,24 @@ Ongoing: Combine all pre-processing steps in one:
 scripts/pre-process/1_preprocess.ijm - WIP!!
 ```
 
-**2. Alignment**  
+
+**2. Segmentation**  
+* 1. Use ilastik to get a probability map for plaques and microglia.  
+```
+cd ilastik/inference
+./run_inference.sh    ## Edit paths to the trained .ilp file and .raw brains
+```
+* 2. Threshold probability map and run connected components (ImageJ).  
+```
+ilastik/macros/n5_to_csv.ijm  ## Edit paths to .n5 files (output from ilastik)
+```
+* 3. Filter-out false positives using probability map.
+```
+WIP!!
+```
+
+
+**3. Alignment**  
 * 1. Generate pre-processes file to use for alignment.  
 !! IMPORTANT: Pixel dimensions must be correct !!
 ```
@@ -45,22 +62,6 @@ scripts/alignment//runall.sh
 * 3. Plotting:
 ```
 scripts/alignment/make_plots_perCase.sh
-```
-
-
-**3. Segmentation**  
-* 1. Use ilastik to get a probability map for plaques and microglia.  
-```
-cd ilastik/inference
-./run_inference.sh    ## Edit paths to the trained .ilp file and .raw brains
-```
-* 2. Threshold probability map and run connected components (ImageJ).  
-```
-ilastik/macros/n5_to_csv.ijm  ## Edit paths to .n5 files (output from ilastik)
-```
-* 3. Filter-out false positives using probability map.
-```
-WIP!!
 ```
 
 **4. Quantification**
