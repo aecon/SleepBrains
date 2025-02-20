@@ -23,7 +23,7 @@ for (i=0; i<Nfiles; i++) {
 		Z = channels;
 		
 		// Change properties (due to subsequent alignment step)
-		run("Properties...", "channels=1 slices="+toString(Z)+" frames=1 pixel_width=3.2600 pixel_height=3.2600 voxel_depth=3.0000");
+		run("Properties...", "channels=1 slices="+toString(slices)+" frames=1 pixel_width=3.2600 pixel_height=3.2600 voxel_depth=3.0000");
 		Stack.setXUnit("microns");
 		Stack.setYUnit("microns");
 		Stack.setZUnit("microns");
