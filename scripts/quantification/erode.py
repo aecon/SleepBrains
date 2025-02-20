@@ -19,7 +19,7 @@ def erode_mask(mask, tmp_dir):
 
     # Parameters
     erosion_steps = 2
-    fatlasD = "/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/4_alignment/atlas/ABA_25um_distance_to_surface_halfbrain.nrrd"
+    fatlasD = "/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/alignment/atlas/ABA_25um_distance_to_surface_halfbrain.nrrd"
 
     # Temporary work arrays
     if not os.path.exists(tmp_dir):

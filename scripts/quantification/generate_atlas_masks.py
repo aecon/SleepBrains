@@ -2,7 +2,8 @@ import os
 import nrrd
 import numpy as np
 from regions import generate_region_mask 
-from erode import erode_mask
+#from erode import erode_mask
+from scipy.ndimage import binary_erosion
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # USER SETTINGS
@@ -30,14 +31,23 @@ if __name__ == "__main__":
 
     regions_include = generate_region_mask(output_dir, "atlas_regions_include", brain_regions_include, resolution)
     regions_exclude = generate_region_mask(output_dir, "atlas_regions_exclude", brain_regions_exclude, resolution)
+    print(regions_include.shape)
+    print(np.unique(regions_include))
+    print(regions_exclude.shape)
+    print(np.unique(regions_exclude))
 
-    mask_regions_exclude_with_erosion = erode_mask(regions_exclude, "%s/tmp")
-    nrrd.write("%s/atlas_regions_exclude_eroded.nrrd" % output_dir, mask_regions_exclude_with_erosion)
+    # Erode selected (included) regions to exclude FP signal at the edge of the regions
+    eroded_regions_include = np.zeros(regions_include.shape)
+    for i in range(len(brain_regions_include)):
+        idx = regions_include==i+1
+        region = np.zeros(regions_include.shape)
+        region[idx] = 1
+        eroded_region = binary_erosion(region, iterations=2)
+        eroded_regions_include[eroded_region>0] = i+1
 
     # Combine into a single mask
-    mask = np.zeros(np.shape(mask_regions_exclude_with_erosion))
-    mask[:,:,:] = regions_include[:,:,:]
-    #mask[mask_regions_exclude_with_erosion==1] = 0
+    mask = np.zeros(regions_include.shape)
+    mask[:,:,:] = eroded_regions_include[:,:,:]
     mask[regions_exclude>0] = 0
     nrrd.write("%s/selected_atlas_areas.nrrd" % output_dir, mask)
 
