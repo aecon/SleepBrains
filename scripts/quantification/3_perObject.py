@@ -8,14 +8,18 @@ import numpy as np
 import pandas as pd
 from generate_atlas_masks import brain_regions_include
 
+# Result will be in ($mm^3$
+dx=3.26*1.e-3
+dz=3.00*1.e-3
+dA=25.0*1.e-3
 
 # DESIGNED TO RUN WITH PARALLEL=FALSE.
-@numba.jit(nopython=True, parallel=False, fastmath=True)
+@numba.jit(nopython=True, parallel=False, fastmath=False)
 def count_points_in_region(regions, indices, volumes, avgprob, Nregions):
     nx,ny,nz = regions.shape
     Np = len(indices)
     counts_per_region = np.zeros(Nregions, dtype=np.int64)
-    volumes_per_region = np.zeros(Nregions, dtype=np.int64)
+    volumes_per_region = np.zeros(Nregions, dtype=np.float32)
     total_prob_per_region = np.zeros(Nregions, dtype=np.float32)
     for pi in range(Np):
         i = indices[pi,0]
@@ -25,11 +29,13 @@ def count_points_in_region(regions, indices, volumes, avgprob, Nregions):
             region_id = regions[i,j,k]
             if region_id > 0:  # if not background
                 counts_per_region[region_id-1] += 1
-                volumes_per_region[region_id-1] += volumes[pi]
+                volumes_per_region[region_id-1] += volumes[pi] * dx*dx*dz # in mm3
                 total_prob_per_region[region_id-1] += avgprob[pi]
-    region_volumes = np.zeros(Nregions)
+
+    # Total volume per brain region in mm3
+    region_volumes = np.zeros(Nregions, dtype=np.float32)
     for i in range(Nregions):
-        region_volumes[i] = np.sum(regions==i+1)
+        region_volumes[i] = np.sum(regions==i+1) * dA*dA*dA # in mm3
 
     return counts_per_region, volumes_per_region, total_prob_per_region, region_volumes
 
@@ -81,20 +87,26 @@ if __name__ == "__main__":
         indices = (points // pixel_size).astype(np.int64)
 
         # Load file with per-object measurements
-        df = pd.read_csv(file_measurements)
-        volumes = df["NumberOfVoxels"].to_numpy()  # In Voxels
-        avgprob = df[" AverageProbability"].to_numpy()
+        df = np.loadtxt(file_measurements, skiprows=1)
+        volumes = df[:,3]  # In Voxels
+        avgprob = df[:,4]
+        print(volumes)
+        print(avgprob)
 
         # Get number of points, volumes and associated probabilities
         counts_per_region, volumes_per_region, total_prob_per_region, region_volumes = count_points_in_region(regions, indices, volumes, avgprob, Nregions)
+        print(volumes_per_region)
+        print(total_prob_per_region)
+        print(region_volumes)
+
 
         # Export to file
         basedir = os.path.dirname(os.path.dirname(os.path.dirname(file_points)))
         brainid = os.path.basename(basedir).split("_")[0]
-        output_file = basedir + os.sep + "Brain%02d_region_counts_volumes_probabilities_%s" % (brainID, channel) + brainid + "_%s.txt" % kind
+        output_file = basedir + os.sep + "Brain%02d_region_counts_volumes_probabilities_%s" % (brainID, channel) + brainid + "_%s.csv" % kind
         print(output_file)
         with open(output_file, "w") as f:
-            f.write("%s %s %s %s\n" % ("Region", "ObjCounts" "ObjVolumes" "ObjProbability" "RegionVolume") )
+            f.write("%s,%s,%s,%s,%s\n" % ("Region", "ObjCounts", "ObjVolumes(mm3)", "ObjProbability", "RegionVolume(mm3)") )
             for i in range(Nregions):
-                f.write("%s %d\n" % (brain_regions_include[i], counts_per_region[i], volumes_per_region[i], total_prob_per_region[i], region_volumes[i]))
+                f.write("%s,%d,%f,%f,%f\n" % (brain_regions_include[i], counts_per_region[i], volumes_per_region[i], total_prob_per_region[i], region_volumes[i]))
 

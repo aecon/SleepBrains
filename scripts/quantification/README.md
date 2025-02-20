@@ -25,7 +25,7 @@ scripts/alignment/selected_atlas_areas_pixel25um_noBulb_2025-02.nrrd
 python 2_regional_counts_volumes_2025-02.py
 ```
 
-**OR**
+**OR - PREFERRED**
 Use the following to get counts, volumes, total probability, and region volume
 ```
 python 3_perObject.py
