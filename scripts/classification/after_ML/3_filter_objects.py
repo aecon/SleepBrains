@@ -67,6 +67,7 @@ class CSVdata():
         self.sphericity     = self.df["Sphericity"].to_numpy()
         self.intensity_avg  = self.df["IntensityAvg"].to_numpy()
         self.intensity_std  = self.df["IntensityStd"].to_numpy()
+        self.intensity_sum  = self.df["IntensitySum"].to_numpy()
  
         self.eps = np.finfo(np.float32).eps  # machine precision
         self.intensity_ratio = self.intensity_std / (self.intensity_avg + self.eps) * 100.
@@ -84,14 +85,14 @@ def generate_list_of_points(X, Y, Z, output_file):
             f.write("%f %f %f\n" % (X[i], Y[i], Z[i]))
 
 
-def generate_list_of_points_with_properties(X, Y, Z, VOL, PAVG, output_file):
+def generate_list_of_points_with_properties(X, Y, Z, VOL, PRATIO, PAVG, PSUM, output_file):
     # Generates a list of points according to the
     # input for elastix's transformix
     Np = len(X)
     with open(output_file, "w") as f:
-        f.write("X(um),Y(um),Z(um),NumberOfVoxels, AverageProbability\n")
+        f.write("X(um),Y(um),Z(um),NumberOfVoxels,ProbabilityRatio,ProbabilityAverage,ProbabilitySum\n")
         for i in range(Np):       
-            f.write("%f %f %f %d %f\n" % (X[i], Y[i], Z[i], VOL[i], PAVG[i]))
+            f.write("%f %f %f %d %f %f %f\n" % (X[i], Y[i], Z[i], VOL[i], PRATIO[i], PAVG[i], PSUM[i]))
 
 
 
@@ -128,7 +129,7 @@ if __name__ == '__main__':
 
         # EXPORT 2: List of plaque centroids AND properties: Volume and Average Probability
         output_file = '%s/coordinates_%s_centroids_with_measurements.csv' % (os.path.dirname(file_csv), basename)
-        generate_list_of_points_with_properties(D0.cx[idx], D0.cy[idx], D0.cz[idx], D0.volumes[idx], D0.intensity_ratio[idx], output_file)
+        generate_list_of_points_with_properties(D0.cx[idx], D0.cy[idx], D0.cz[idx], D0.volumes[idx], D0.intensity_ratio[idx], D0.intensity_avg[idx], D0.intensity_sum[idx], output_file)
 
 
 #        # Load 3D data
