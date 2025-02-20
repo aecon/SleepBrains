@@ -10,7 +10,7 @@ import pandas as pd
 
 # ALSO HAS TO BE RUN WITH PARALLEL=FALSE!
 @numba.jit(nopython=True, parallel=False, fastmath=True)
-def get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std):
+def get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std, intensity_sum):
 #                     float32  int64       int64      int64         float32        float32
     nx,ny,nz = pmap.shape  # checked: nrrd loads data in (Y,X,Z) format
     Nlabels = len(volumes)
@@ -34,6 +34,7 @@ def get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mea
         # At the end of the loop for this object, compute mean, std
         intensity_mean[idx] = np.nanmean(intensities.astype(np.float32))
         intensity_std[idx]  = np.nanstd( intensities.astype(np.float32))
+        intensity_sum[idx]  = np.nansum( intensities.astype(np.float32))
 
 
 # HAS TO BE PARALLEL=FALSE! PARALLEL VERSION WILL HAVE RACE CONDITION ON COUNTER
@@ -120,14 +121,16 @@ if __name__ == '__main__':
         get_coordinates(labels3, labels, volumes, counts_cumsum, coordinates)
         #
         # --> Step 2: Compute intensity stats per object
+        intensity_sum = np.zeros(len(labels), dtype=np.float32)
         intensity_mean = np.zeros(len(labels), dtype=np.float32)
         intensity_std  = np.zeros(len(labels), dtype=np.float32)
         print("- Getting intensity stats")
-        get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std)
+        get_intensity_stats(pmap, volumes, coordinates, counts_cumsum, intensity_mean, intensity_std, intensity_sum)
 
         # Add column to dataframe
         df['IntensityAvg'] = intensity_mean
         df['IntensityStd'] = intensity_std
+        df['IntensitySum'] = intensity_sum
 
         # Export to csv
         print("Exporting to csv ...")
@@ -142,4 +145,5 @@ if __name__ == '__main__':
         del counts_cumsum
         del intensity_mean
         del intensity_std
+        del intensity_sum
 
