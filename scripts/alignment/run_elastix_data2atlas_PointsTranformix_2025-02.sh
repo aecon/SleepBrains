@@ -46,12 +46,17 @@ threads=32
 outEa=${out}/elastix_affine_LISA_noBulb_preprocessed_Bin2-Cap-Gaus3D2_try20
 outEb=${out}/elastix_bspline_LISA_10k_125umGrid1_SmoothAll2_noBulb_BsplineInterpolator_try20
 outI=${out}/inverse_transform
-
 outTPC=${out}/transformix_${kind}_Feb2025
+outA=${out}/annotation_atlas_Feb2025
+outAEa=${out}/annotation_elastix_affine
+outAEb=${out}/annotation_elastix_bspline
 mkdir -p "${outEa}"
 mkdir -p "${outEb}"
-mkdir -p "${outTPC}"
 mkdir -p "${outI}"
+mkdir -p "${outTPC}"
+mkdir -p "${outA}"
+mkdir -p "${outAEa}"
+mkdir -p "${outAEb}"
 
 # registration of atlas onto the autofluorescence channel
 if [ ! -f "${outEa}/result.0.nrrd" ]; then
@@ -91,5 +96,22 @@ if [ ! -f "${outTPC}/outputpoints.txt" ]; then
     mv "${outTPC}/TransformParameters.0.txt" "${outTPC}/TransformParameters.0ed.txt"
 
     ${transformix} -def "${points_file}" -out "${outTPC}" -tp "${outTPC}/TransformParameters.0ed.txt" -threads $threads
+fi
+
+# Transformation of annotation atlas 
+if [ ! -f "${outAEa}/result.0.nrrd" ]; then
+    ${elastix} -out "${outAEa}" -f "${input_auto}" -m "${atlas}" -p "${affine}" -threads $threads
+fi
+if [ ! -f "${outAEb}/result.0.nrrd" ]; then
+    ${elastix} -out "${outAEb}" -f "${input_auto}" -m "${atlas}" -p "${bspline}" -t0 "${outAEa}/TransformParameters.0.txt"  -threads $threads
+fi
+if [ ! -f "${outA}/result.nrrd" ]; then
+    cp "${outAEb}/TransformParameters.0.txt" "${outA}"/
+
+    # edit the Bspline file to use for transforming binary segmented data
+    sed -i "/FinalBSplineInterpolationOrder/c\(FinalBSplineInterpolationOrder 0)" "${outA}"/TransformParameters.0.txt
+
+    # apply transformation to segmentation
+    ${transformix} -in "${atlas_annotation}" -out "${outA}" -tp "${outA}/TransformParameters.0.txt" -threads $threads
 fi
 
