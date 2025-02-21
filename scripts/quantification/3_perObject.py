@@ -15,7 +15,7 @@ dA=25.0*1.e-3
 
 # DESIGNED TO RUN WITH PARALLEL=FALSE.
 @numba.jit(nopython=True, parallel=False, fastmath=False)
-def count_points_in_region(regions, indices, volumes, avgprob, Nregions):
+def count_points_in_region(regions, indices, volumes, psum, Nregions):
     nx,ny,nz = regions.shape
     Np = len(indices)
     counts_per_region = np.zeros(Nregions, dtype=np.int64)
@@ -30,7 +30,7 @@ def count_points_in_region(regions, indices, volumes, avgprob, Nregions):
             if region_id > 0:  # if not background
                 counts_per_region[region_id-1] += 1
                 volumes_per_region[region_id-1] += volumes[pi] * dx*dx*dz # in mm3
-                total_prob_per_region[region_id-1] += avgprob[pi]
+                total_prob_per_region[region_id-1] += psum[pi]
 
     # Total volume per brain region in mm3
     region_volumes = np.zeros(Nregions, dtype=np.float32)
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         print("Processing:")
         print(file_centroids)
         brainID = int(os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(file_centroids)))).split("Brain")[1].split("_")[0])
-        file_measurements = "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/ILASTIK/predictions_488_allBrains_ilp-v4/nrrd/coordinates_Brain%02d_488_centroids_with_measurements.csv" % brainID
+        file_measurements = "/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/ILASTIK/object_centroids_with_measurements/coordinates_Brain%02d_488_centroids_with_measurements.csv" % brainID
         print(file_measurements)
 
 
@@ -87,14 +87,19 @@ if __name__ == "__main__":
         indices = (points // pixel_size).astype(np.int64)
 
         # Load file with per-object measurements
+        # X(um),Y(um),Z(um),NumberOfVoxels,ProbabilityRatio,ProbabilityAverage,ProbabilitySum
         df = np.loadtxt(file_measurements, skiprows=1)
         volumes = df[:,3]  # In Voxels
-        avgprob = df[:,4]
+        pratio = df[:,4]
+        pavg = df[:,5]
+        psum = df[:,6]
         print(volumes)
-        print(avgprob)
+        print(pratio)
+        print(pavg)
+        print(psum)
 
         # Get number of points, volumes and associated probabilities
-        counts_per_region, volumes_per_region, total_prob_per_region, region_volumes = count_points_in_region(regions, indices, volumes, avgprob, Nregions)
+        counts_per_region, volumes_per_region, total_prob_per_region, region_volumes = count_points_in_region(regions, indices, volumes, psum, Nregions)
         print(volumes_per_region)
         print(total_prob_per_region)
         print(region_volumes)
@@ -106,7 +111,7 @@ if __name__ == "__main__":
         output_file = basedir + os.sep + "Brain%02d_region_counts_volumes_probabilities_%s" % (brainID, channel) + brainid + "_%s.csv" % kind
         print(output_file)
         with open(output_file, "w") as f:
-            f.write("%s,%s,%s,%s,%s\n" % ("Region", "ObjCounts", "ObjVolumes(mm3)", "ObjProbability", "RegionVolume(mm3)") )
+            f.write("%s,%s,%s,%s,%s\n" % ("Region","ObjCounts","Concentration(V/V)","TotalProbabilityOverRegionNpixels","MeanPlaqueSize(Um3)") )
             for i in range(Nregions):
-                f.write("%s,%d,%f,%f,%f\n" % (brain_regions_include[i], counts_per_region[i], volumes_per_region[i], total_prob_per_region[i], region_volumes[i]))
+                f.write("%s,%d,%.6e,%.6e,%.6e\n" % (brain_regions_include[i], counts_per_region[i], volumes_per_region[i]/region_volumes[i], total_prob_per_region[i]*dx*dx*dz/region_volumes[i], volumes_per_region[i]/float(counts_per_region[i])*1.e3*1.e3*1.e3 ))
 
