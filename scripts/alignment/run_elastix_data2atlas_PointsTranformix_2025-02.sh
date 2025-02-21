@@ -33,8 +33,8 @@ atlas="atlas/ABA_25um_reference_hemisphere_noBulb.nrrd"
 ls $atlas
 
 # ANNOTATION ATLAS
-#atlas_annotation="atlas/ABA_25um_annotation_hemisphere.nrrd"
-atlas_annotation="/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/output/selected_atlas_areas_pixel25um.nrrd"
+atlas_annotation="atlas/selected_atlas_areas_pixel25um_noBulb_2025-02.nrrd"
+#atlas_annotation="/media/user/SSD1/Athena/SOURCE/SleepBrains/scripts/quantification/output/selected_atlas_areas_pixel25um.nrrd"
 ls $atlas_annotation
 
 affine="Lisa/Parameters_affine.txt"
@@ -77,8 +77,12 @@ fi
 
 # Transformation of a list of points
 if [ ! -f "${outTPC}/outputpoints.txt" ]; then
-    points_file=`dirname ${input_auto}`/coordinates_*_${kind}_*.txt
-    points_file=`ls $points_file`
+    #points_file=`dirname ${input_auto}`/coordinates_*_${kind}_*.txt
+    brainID=`basename ${input_auto} | awk -F  'Brain' '{print $2}' | awk -F  '_' '{printf("%02d\n", $1)}'`
+    echo ${brainID}
+
+    points_file="/media/user/SSD1/Athena/Data/PROJECT_SLEEP_2024-09/ILASTIK/object_centroids/coordinates_Brain${brainID}_${kind}_centroids.txt"
+    ls $points_file
 
     cp "${outI}/TransformParameters.0.txt" "${outTPC}"/
 
