@@ -90,6 +90,6 @@ scripts/alignment/make_plots_perCase.sh
 ### quantification
 - [x] Count plaques per region, export in txt.
 - [x] Code is too slow (was developed for smaller brains). Export list of plaque centers, do transformix on points list, then count inside regions.
-- [ ] Make statistics plots.
-- [ ] Voxel-wise pvalues: Compute average number of plaques per voxel. -> NEED TO BE ALIGNED ON THE SAME SPACE FOR THIS..
+- [x] Make statistics plots.
+- [x] Voxel-wise pvalues: Compute average number of plaques per voxel. -> NEED TO BE ALIGNED ON THE SAME SPACE FOR THIS..
 
