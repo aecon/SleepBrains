@@ -77,8 +77,8 @@ scripts/alignment/make_plots_perCase.sh
 - [x] Segment plaques.
 - [x] Check plaques segmentation.
 - [x] Filter-out artifacts: Analyze Particles works on 2D. MorphoLibJ can compute per object measurements. Use them to filter out objects. Can do in ImageJ or python needed?
-- [ ] Segment microglia.
-- [ ] Check microglia segmentation.
+- [x] Segment microglia.
+- [x] Check microglia segmentation.
 
 ### alignment
 - [x] Align all brains (plaque channel).
