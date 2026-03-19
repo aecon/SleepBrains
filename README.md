@@ -1,6 +1,9 @@
 # SleepBrains
-Quantification of plaques and microglia cells in murine brains.
 
+This repository implements an end-to-end pipeline for 3D quantification of plaques and microglia in whole murine brains, supporting the study of prime editing of the β1-adrenoceptor to restore physiological REM sleep in an Alzheimer’s disease mouse model. The workflow combines machine learning–based instance segmentation with ilastik and deformable registration to the Allen Brain Atlas, enabling region-specific analysis of pathological markers.
+
+**Böck, D., et al. Prime editing of the β1 adrenoceptor in the brain restores physiological REM sleep in a mouse model of Alzheimer’s disease. Nature Communications 16, 10973 (2025).**  
+[https://doi.org/10.1038/s41467-025-65964-w](https://doi.org/10.1038/s41467-025-65964-w)
 
 ## Installation
 ```
